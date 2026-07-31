@@ -3,676 +3,1227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Llamadas</title>
-    
-    <!-- Librería para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <title>Global Life - Plataforma de Capacitaciones</title>
+    <!-- Logo en la pestaña del navegador -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- html2pdf.js para exportar certificados en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #333333;
+            --gl-blue-primary: #2263fc;
+            --gl-blue-secondary: #2956b1;
+            --gl-blue-light: #659bee;
         }
         body {
+            background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 15px;
+            color: #333333;
         }
-        h2 {
+        .login-card {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(34, 99, 207, 0.08);
+            padding: 35px 30px;
+            border-top: 5px solid var(--gl-blue-primary);
+        }
+        .logo-container {
             text-align: center;
-            color: var(--primary);
-            margin-top: 0;
+            margin-bottom: 20px;
         }
-        
-        /* =========================================
-           NUEVO: Estilos para los botones de las pestañas
-           ========================================= */
-        .tab-container {
+        .brand-logo {
+            max-height: 85px;
+            width: auto;
+            object-fit: contain;
+        }
+        .btn-ingresar {
+            background-color: var(--gl-blue-primary);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-ingresar:hover {
+            background-color: var(--gl-blue-secondary);
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 11px 14px;
+            border-color: #cbd5e1;
+            font-size: 14px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--gl-blue-light);
+            box-shadow: 0 0 0 0.25rem rgba(34, 99, 207, 0.15);
+        }
+        .browser-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+        .browser-icon:hover {
+            transform: scale(1.1);
+        }
+        .cuadro-pregunta {
+            width: 38px;
+            height: 38px;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .tab-btn {
-            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 8px;
             cursor: pointer;
-            background-color: #6c757d;
+            border: 2px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .cuadro-pregunta.respondida {
+            background-color: #198754;
             color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            border-color: #198754;
         }
-        .tab-btn:hover {
-            background-color: #5a6268;
-        }
-        .tab-btn.active {
-            background-color: var(--primary);
-        }
-        .hidden-view {
-            display: none !important;
-        }
-        /* ========================================= */
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            align-items: flex-end;
-        }
-        .control-group {
-            flex: 1;
-            min-width: 140px;
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        input[type="date"], select, button {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-family: inherit;
-            background-color: white;
-            font-size: 0.95em;
-            outline: none;
-        }
-        select, button {
-            cursor: pointer;
-        }
-        .btn-export {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            font-weight: bold;
-            padding: 10px 15px;
-            transition: background 0.3s;
-        }
-        .btn-export:hover {
-            background-color: #059669;
-        }
-        .kpi-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .kpi-card {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .kpi-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        .kpi-label {
-            font-size: 0.85em;
-            color: #666;
-            text-transform: capitalize;
-        }
-        
-        /* Contenedor dinámico para organizar los 3 gráficos */
-        .charts-wrapper {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .chart-container {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            position: relative;
-            height: 300px;
-        }
-        
-        .loading {
-            text-align: center;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #e8ecff;
-            border-radius: 5px;
-        }
-        
-        .table-container {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            overflow-x: auto;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9em;
-        }
-        th {
-            background-color: #f1f3f5;
-            color: #444;
-        }
-        hr.divider {
-            border: 0;
-            height: 2px;
-            background: #e2e8f0;
-            margin: 30px 0;
+        .cuadro-pregunta.actual {
+            border-color: var(--gl-blue-primary);
+            box-shadow: 0 0 0 3px rgba(34, 99, 207, 0.25);
         }
     </style>
 </head>
 <body>
 
-    <h2>Dashboard de Llamadas</h2>
-
-    <!-- =========================================
-         NUEVO: Botones para cambiar de vista 
-         ========================================= -->
-    <div class="tab-container">
-        <button id="btn-dashboard" class="tab-btn active" onclick="switchView('dashboard')">Ver Dashboard</button>
-        <button id="btn-exportar" class="tab-btn" onclick="switchView('exportar')">Ver Módulo de Exportación</button>
-    </div>
-
-    <!-- =========================================
-         SECCIÓN 1: DASHBOARD (Visible por defecto)
-         ========================================= -->
-    <div id="view-dashboard">
-        <div id="status" class="loading">Cargando datos seguros desde Google Sheets...</div>
-
-        <!-- Filtros principales de fecha y usuario -->
-        <div class="controls">
-            <div class="control-group">
-                <label for="startDate">Desde:</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="control-group">
-                <label for="endDate">Hasta:</label>
-                <input type="date" id="endDate">
-            </div>
-            <div class="control-group">
-                <label id="userLabel" for="userFilter">Funcionario / Asesor:</label>
-                <select id="userFilter">
-                    <option value="">Cargando funcionarios...</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Tarjetas de resumen (KPIs) dinámicas -->
-        <div class="kpi-container" id="kpi-container"></div>
-
-        <!-- Gráficos agrupados -->
-        <div class="charts-wrapper">
-            <div class="chart-container">
-                <canvas id="chartCargo"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="chartLista"></canvas>
-            </div>
-            <!-- Nuevo Gráfico -->
-            <div class="chart-container">
-                <canvas id="chartInteresadosCargo"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- =========================================
-         SECCIÓN 2: EXPORTACIÓN (Oculta por defecto)
-         ========================================= -->
-    <div id="view-exportar" class="hidden-view">
-        <hr class="divider">
-        <h2>Módulo de Exportación de Datos</h2>
-
-        <!-- Controles de la Tabla Exportable -->
-        <div class="controls">
-            <div class="control-group">
-                <label for="listaFilter">Filtrar tabla por Estado de Lista:</label>
-                <select id="listaFilter">
-                    <option value="TODOS">Todos los estados</option>
-                </select>
-            </div>
-            <div class="control-group" style="flex: 0 1 auto;">
-                <button id="btnExport" class="btn-export">Exportar a CSV 📥</button>
-            </div>
-        </div>
-
-        <!-- Tabla de visualización de datos filtrados -->
-        <div class="table-container">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Nombre</th>
-                        <th>Cargo</th>
-                        <th>Celular</th>
-                        <th>Estado Lista</th>
-                    </tr>
-                </thead>
-                <tbody id="dataTableBody">
-                    <!-- Los datos se inyectarán aquí -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <script>
-        // =========================================
-        // NUEVA FUNCIÓN: Cambiar entre Dashboard y Exportación
-        // =========================================
-        function switchView(view) {
-            if (view === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden-view');
-                document.getElementById('view-exportar').classList.add('hidden-view');
-                document.getElementById('btn-dashboard').classList.add('active');
-                document.getElementById('btn-exportar').classList.remove('active');
-            } else {
-                document.getElementById('view-dashboard').classList.add('hidden-view');
-                document.getElementById('view-exportar').classList.remove('hidden-view');
-                document.getElementById('btn-dashboard').classList.remove('active');
-                document.getElementById('btn-exportar').classList.add('active');
-            }
-        }
-
-        // =========================================
-        // TU CÓDIGO ORIGINAL INTACTO DESDE AQUÍ
-        // =========================================
+    <div class="container py-4">
         
-        // ID de tu hoja de cálculo de Google
-        const sheetID = '1VUkxrVjr2P2_XZYGGnSk08SHGw4gvxQlRURVsEYryZI';
-        
-        let rawData = [];
-        let currentFilteredData = [];
-        let chartCargoInstance = null;
-        let chartListaInstance = null;
-        let chartInteresadosInstance = null; // Instancia para el nuevo gráfico
-        let userColumnKey = null;
-
-        window.onload = () => {
-            fetchData();
-            
-            document.getElementById('startDate').addEventListener('change', filterAndUpdate);
-            document.getElementById('endDate').addEventListener('change', filterAndUpdate);
-            document.getElementById('userFilter').addEventListener('change', filterAndUpdate);
-            
-            document.getElementById('listaFilter').addEventListener('change', actualizarTabla);
-            document.getElementById('btnExport').addEventListener('click', exportarCSV);
-        };
-
-        function fetchData() {
-            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=responseHandler:handleData`;
-            const script = document.createElement('script');
-            script.src = jsonpURL;
-            script.onerror = function() {
-                document.getElementById('status').innerText = 'Error de conexión. Asegúrate de estar conectado a internet.';
-                document.getElementById('status').style.color = 'red';
-            };
-            document.head.appendChild(script);
-        }
-
-        window.handleData = function(response) {
-            try {
-                if (!response || !response.table) {
-                    document.getElementById('status').innerText = 'Error: Estructura de tabla no reconocida.';
-                    document.getElementById('status').style.color = 'red';
-                    return;
-                }
-
-                const cols = response.table.cols.map(col => col ? (col.label || '').trim() : '');
-                const rows = response.table.rows;
-
-                rawData = rows.map(row => {
-                    let rowDataObj = {};
-                    if (row && row.c) {
-                        row.c.forEach((cell, index) => {
-                            const colName = cols[index];
-                            if (colName) {
-                                let val = '';
-                                if (cell) {
-                                    val = cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '');
-                                }
-                                rowDataObj[colName] = String(val).trim();
-                            }
-                        });
-                    }
-                    return rowDataObj;
-                });
-
-                rawData = rawData.filter(row => row['Hora de llamada'] && row['Hora de llamada'] !== '');
-
-                if (rawData.length === 0) {
-                    document.getElementById('status').innerText = 'Error: No se encontraron datos válidos.';
-                    document.getElementById('status').style.color = 'red';
-                    return;
-                }
-
-                document.getElementById('status').style.display = 'none';
-                
-                configurarFiltroUsuario();
-                configurarFiltroLista(); 
-                establecerFechasPorDefecto();
-                filterAndUpdate();
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById('status').innerText = 'Ocurrió un error procesando los datos: ' + error.message;
-                document.getElementById('status').style.color = 'red';
-            }
-        };
-
-        function configurarFiltroUsuario() {
-            const userFilterSelect = document.getElementById('userFilter');
-            userFilterSelect.innerHTML = '<option value="">Todos los funcionarios</option>';
-            if (rawData.length === 0) return;
-
-            const keys = Object.keys(rawData[0]);
-            const keywords = ['asesor', 'usuario', 'funcionario', 'agente', 'operador', 'responsable', 'registrado', 'creado', 'quien'];
-            
-            userColumnKey = keys.find(key => {
-                const lowerKey = key.toLowerCase();
-                return keywords.some(keyword => lowerKey.includes(keyword));
-            });
-
-            if (!userColumnKey) {
-                userColumnKey = keys.find(key => key.toLowerCase().includes('nombre completo'));
-            }
-
-            if (userColumnKey) {
-                document.getElementById('userLabel').innerText = `Filtrar por ${userColumnKey}:`;
-                const usuariosUnicos = [...new Set(rawData.map(row => (row[userColumnKey] || '').trim()))]
-                    .filter(val => val !== '').sort();
-
-                usuariosUnicos.forEach(usuario => {
-                    const option = document.createElement('option');
-                    option.value = usuario;
-                    option.text = usuario;
-                    userFilterSelect.appendChild(option);
-                });
-            } else {
-                document.getElementById('userLabel').innerText = 'Funcionario / Asesor:';
-                userFilterSelect.innerHTML += '<option disabled>(No se halló columna)</option>';
-            }
-        }
-
-        function configurarFiltroLista() {
-            const listaFilterSelect = document.getElementById('listaFilter');
-            listaFilterSelect.innerHTML = '<option value="TODOS">Todos los estados</option>';
-            
-            const estadosUnicos = [...new Set(rawData.map(row => (row['LISTA'] || 'Sin clasificar').trim()))]
-                    .filter(val => val !== '').sort();
-
-            estadosUnicos.forEach(estado => {
-                const option = document.createElement('option');
-                option.value = estado;
-                option.text = estado;
-                listaFilterSelect.appendChild(option);
-            });
-        }
-
-        function parseSheetDate(dateString) {
-            if(!dateString) return null;
-            let datePart = dateString.split(',')[0].trim(); 
-            let parts = datePart.split('/');
-            if(parts.length === 3) {
-                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-            }
-            return null;
-        }
-
-        function establecerFechasPorDefecto() {
-            let fechasValidas = rawData.map(r => parseSheetDate(r['Hora de llamada'])).filter(d => d).sort();
-            if(fechasValidas.length > 0) {
-                document.getElementById('startDate').value = fechasValidas[0]; 
-                document.getElementById('endDate').value = fechasValidas[fechasValidas.length - 1]; 
-            }
-        }
-
-        function filterAndUpdate() {
-            const start = document.getElementById('startDate').value;
-            const end = document.getElementById('endDate').value;
-            const selectedUser = document.getElementById('userFilter').value;
-
-            currentFilteredData = rawData.filter(row => {
-                let rowDate = parseSheetDate(row['Hora de llamada']);
-                if(!rowDate) return false;
-                
-                let inRange = true;
-                if(start && rowDate < start) inRange = false;
-                if(end && rowDate > end) inRange = false;
-                
-                if(inRange && selectedUser && userColumnKey) {
-                    let rowUser = (row[userColumnKey] || '').trim();
-                    if(rowUser !== selectedUser) inRange = false;
-                }
-                return inRange;
-            });
-
-            actualizarKPIs(currentFilteredData);
-            actualizarGraficos(currentFilteredData);
-            actualizarTabla(); 
-        }
-
-        function actualizarKPIs(data) {
-            const kpiContainer = document.getElementById('kpi-container');
-            const cargosCount = {};
-            
-            data.forEach(row => {
-                let cargo = (row['Cargo'] || 'Desconocido').trim().toLowerCase();
-                if (cargo !== '') {
-                    cargosCount[cargo] = (cargosCount[cargo] || 0) + 1;
-                }
-            });
-
-            let htmlCards = `
-                <div class="kpi-card">
-                    <div class="kpi-value">${data.length}</div>
-                    <div class="kpi-label">Total Llamadas</div>
+        <!-- PANTALLA DE INICIO DE SESIÓN -->
+        <div class="login-card" id="cardLogin">
+            <div class="logo-container">
+                <div class="mb-1">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life" class="brand-logo">
                 </div>
-            `;
+            </div>
 
-            Object.keys(cargosCount).forEach(cargo => {
-                htmlCards += `
-                    <div class="kpi-card">
-                        <div class="kpi-value">${cargosCount[cargo]}</div>
-                        <div class="kpi-label">${cargo}</div>
+            <div class="text-center mb-4">
+                <span class="fw-bold text-dark" style="font-size: 18px; color: var(--gl-blue-secondary) !important;">
+                    <i class="fas fa-sign-in-alt me-2" style="color: var(--gl-blue-primary);"></i> Iniciar sesión
+                </span>
+            </div>
+
+            <form id="formLogin">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold small"><i class="fas fa-user me-1"></i> Usuario (Identificación)</label>
+                    <input type="text" class="form-control bg-light" id="inputUsuario" placeholder="CEDULA" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small"><i class="fas fa-lock me-1"></i> Contraseña (Fecha Expedición)</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control bg-light border-end-0" id="inputPassword" required>
+                    </div>
+                    <div class="form-text text-muted mt-1.5" style="font-size: 11px;">Seleccione o ingrese la fecha de expedición de su cédula.</div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-ingresar shadow-sm">
+                        Ingresar
+                    </button>
+                </div>
+
+                <div id="resultadoLogin" class="mb-3"></div>
+
+                <hr class="text-muted opacity-25 my-4">
+
+                <div class="text-center mt-3">
+                    <span class="text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Navegadores recomendados</span>
+                    <div class="d-flex justify-content-center align-items-center gap-4 mt-3">
+                        <img src="https://lh3.googleusercontent.com/d/1JfQdOkYWxZuBuXrk5dLJzNP_5xbqZA1A" alt="Google Chrome" class="browser-icon" title="Google Chrome">
+                        <img src="https://lh3.googleusercontent.com/d/1NTpCeJqGs9iNwxMT45f8JLNZ-GzCxRRD" alt="Mozilla Firefox" class="browser-icon" title="Mozilla Firefox">
+                        <img src="https://lh3.googleusercontent.com/d/1rnmsTu_RtIMcsrLbYoTlCsLHc_1XOuca" alt="Microsoft Edge" class="browser-icon" title="Microsoft Edge">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- PANEL DE ADMINISTRACIÓN (MÓDULO UNIFICADO) -->
+        <div class="row justify-content-center d-none" id="cardPanelAdmin">
+            <div class="col-lg-10">
+                <div class="card shadow border-0 rounded-4 overflow-hidden mb-4">
+                    <div class="card-header text-white p-4 d-flex justify-content-between align-items-center" style="background-color: var(--gl-blue-secondary);">
+                        <div>
+                            <h3 class="mb-0 fs-5"><i class="fas fa-shield-alt me-2"></i> Portal Administrativo - Global Life</h3>
+                            <p class="mb-0 text-white-50 small mt-1">Bienvenido(a), <span id="nombreAdminLogueado" class="fw-bold text-white"></span></p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-light btn-sm px-3 rounded-pill fw-bold text-primary" onclick="cambiarVistaUsuario()"><i class="fas fa-graduation-cap me-1"></i> Ver Mis Capacitaciones</button>
+                            <button class="btn btn-outline-light btn-sm px-3 rounded-pill" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-1"></i> Salir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MÓDULO UNIFICADO -->
+                <div class="card shadow border-0 rounded-4 p-4 p-md-5 mb-4">
+                    <div id="seccionSelectorModificacion" class="mb-4 p-3 bg-light rounded-3 border d-none">
+                        <label class="form-label small fw-bold text-primary mb-1"><i class="fas fa-edit me-1"></i> Seleccionar Capacitación Existente para Modificar:</label>
+                        <select id="selectCapacitacionMod" class="form-select form-select-sm" onchange="cargarDatosCapacitacionSeleccionada()">
+                            <option value="">-- Crear una nueva capacitación --</option>
+                        </select>
+                    </div>
+
+                    <form id="formCapacitacion">
+                        <input type="hidden" id="editCapId" value="">
+                        <h5 class="fw-bold mb-4" style="color: var(--gl-blue-primary); font-size: 16px;" id="tituloFormAccion">Información General de la Capacitación</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Nombre de la Capacitación</label>
+                                <input type="text" class="form-control" id="nombreCap" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Código</label>
+                                <input type="text" class="form-control" id="codigoCap" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Categoría</label>
+                                <select class="form-select" id="catCap" required>
+                                    <option value="Capacitación" selected>Capacitación</option>
+                                    <option value="Inducción">Inducción</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Responsable</label>
+                                <input type="text" class="form-control" id="respCap" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary">Descripción</label>
+                                <textarea class="form-control" id="descCap" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-secondary">Duración (Horas)</label>
+                                <input type="number" class="form-control" id="durCap" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold text-secondary">Nota Mínima (%)</label>
+                                <input type="number" class="form-control" id="notaMin" value="70" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-secondary">Intentos Permitidos</label>
+                                <select class="form-select" id="intentosPermitidos">
+                                    <option value="1" selected>1 Intento</option>
+                                    <option value="2">2 Intentos</option>
+                                    <option value="3">3 Intentos</option>
+                                    <option value="5">5 Intentos</option>
+                                    <option value="0">Ilimitados</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-secondary">¿Genera Certificado?</label>
+                                <select class="form-select" id="generaCertificado">
+                                    <option value="SI" selected>SI</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Preguntas en Examen (Aleatorias)</label>
+                                <select class="form-select" id="cantPregExamen">
+                                    <option value="5">5 Preguntas</option>
+                                    <option value="10" selected>10 Preguntas</option>
+                                    <option value="15">15 Preguntas</option>
+                                    <option value="20">20 Preguntas</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Valor Porcentual por Pregunta</label>
+                                <input type="text" class="form-control bg-light text-success fw-bold" id="valorPorcentual" value="10.00% por cada acierto" readonly>
+                            </div>
+                            <div class="col-12" id="contenedorUrlYoutube">
+                                <label class="form-label small fw-semibold text-danger"><i class="fab fa-youtube me-1"></i> Enlace de YouTube</label>
+                                <input type="url" class="form-control" id="ytUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4 pt-2">
+                            <button type="submit" id="btnAccionForm" class="btn btn-success py-3 rounded-3 fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i> Guardar Capacitación y Examen
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-5">
+
+                    <!-- GESTIÓN DEL BANCO DE PREGUNTAS -->
+                    <h5 class="fw-bold mb-3" style="color: var(--gl-blue-primary); font-size: 16px;"><i class="fas fa-question-circle me-2"></i> Gestión del Banco de Preguntas</h5>
+
+                    <ul class="nav nav-tabs mb-4" id="subtabBanco" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold" id="sub-masiva-tab" data-bs-toggle="tab" data-bs-target="#sub-masiva" type="button" role="tab"><i class="fas fa-file-excel me-2"></i> Carga Masiva (Excel)</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold" id="sub-manual-tab" data-bs-toggle="tab" data-bs-target="#sub-manual" type="button" role="tab"><i class="fas fa-edit me-2"></i> Crear Manual</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="sub-masiva" role="tabpanel">
+                            <div class="p-4 border rounded-3 bg-white">
+                                <h6 class="text-success fw-bold mb-3"><i class="fas fa-cloud-upload-alt me-2"></i> Subir Plantilla de Cuestionario</h6>
+                                <p class="text-muted small">Selecciona tu archivo <code>.xlsx</code> con las columnas de preguntas.</p>
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" id="excelFile" accept=".xlsx, .xls, .csv">
+                                </div>
+                                <button type="button" class="btn btn-success mb-3" id="btnProcesar" onclick="procesarExcelPorLotes()">
+                                    <i class="fas fa-upload me-2"></i> Procesar y Subir al Banco
+                                </button>
+                                <div id="resultadoSalida" class="mt-3"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="sub-manual" role="tabpanel">
+                            <form id="formPreguntaManual">
+                                <h6 class="text-primary fw-bold mb-3">Registrar Pregunta Individual</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Texto de la Pregunta</label>
+                                        <textarea class="form-control" id="mPregunta" rows="2" required></textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Tipo de Pregunta</label>
+                                        <select class="form-select" id="mTipo">
+                                            <option value="Unica">Opción Múltiple (Única respuesta)</option>
+                                            <option value="VerdaderoFalso">Verdadero / Falso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Categoría</label>
+                                        <input type="text" class="form-control" id="mCategoria" value="Capacitación" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Puntaje</label>
+                                        <input type="number" class="form-control" id="mPuntaje" value="5" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Opciones (Separadas por punto y coma ; )</label>
+                                        <input type="text" class="form-control" id="mOpciones" placeholder="Opción A; Opción B; Opción C; Opción D" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Respuesta Correcta exacta</label>
+                                        <input type="text" class="form-control" id="mRespuesta" placeholder="Debe coincidir exactamente con una de las opciones" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i> Guardar Pregunta
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL DE USUARIO FINAL (PORTAL DEL COLABORADOR) -->
+        <div class="row justify-content-center d-none" id="cardPanelUsuario">
+            <div class="col-lg-10" id="vistaListaCapacitaciones">
+                <div class="card shadow border-0 rounded-4 overflow-hidden mb-4">
+                    <div class="card-header text-white p-4 d-flex justify-content-between align-items-center" style="background-color: var(--gl-blue-secondary);">
+                        <div>
+                            <h3 class="mb-0 fs-5"><i class="fas fa-graduation-cap me-2"></i> Portal de Capacitaciones - Colaborador</h3>
+                            <p class="mb-0 text-white-50 small mt-1">Bienvenido(a), <span id="nombreUsuarioLogueado" class="fw-bold text-white"></span></p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button id="btnVolverAdmin" class="btn btn-light btn-sm px-3 rounded-pill fw-bold text-primary d-none" onclick="regresarAlAdmin()"><i class="fas fa-cog me-1"></i> Panel Admin</button>
+                            <button class="btn btn-outline-light btn-sm px-3 rounded-pill" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-1"></i> Salir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-book-reader me-2 text-primary"></i> Mis Capacitaciones Asignadas</h5>
+                
+                <div class="row g-4" id="contenedorListaCapacitacionesUsuario">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <!-- VISTA DEL EXAMEN INTERACTIVO -->
+            <div class="col-lg-10 d-none" id="vistaExamenInteractivo">
+                <div class="card shadow border-0 rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                        <div>
+                            <h4 class="fw-bold text-primary mb-1" id="tituloExamenCap">Evaluación</h4>
+                            <p class="text-muted small mb-0">Responde cada pregunta. Tienes 60 segundos por pregunta.</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-danger p-2 fs-6" id="cronometroExamen"><i class="fas fa-clock me-1"></i> 60s</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-3 bg-light rounded-3 border">
+                        <span class="small fw-bold text-secondary d-block mb-2">Panel de Preguntas:</span>
+                        <div class="d-flex flex-wrap gap-2" id="cuadrosNavegacionPreguntas"></div>
+                    </div>
+
+                    <div id="contenedorPreguntaActual" class="mb-4"></div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 rounded-pill fw-bold" id="btnAnteriorPregunta" onclick="navegarPregunta(-1)">
+                            <i class="fas fa-arrow-left me-2"></i> Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary px-4 rounded-pill fw-bold" id="btnSiguientePregunta" onclick="navegarPregunta(1)">
+                            Siguiente <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        <button type="button" class="btn btn-success px-4 rounded-pill fw-bold d-none" id="btnFinalizarExamen" onclick="confirmarEnvioExamen()">
+                            <i class="fas fa-paper-plane me-2"></i> Finalizar y Enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
+    <div style="display: none;">
+      <div id="certificadoPDF" style="width: 800px; padding: 40px; background: #ffffff; border: 10px solid #2956b1; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; color: #1e293b; position: relative;">
+        <div style="margin-bottom: 25px;">
+          <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" style="max-height: 80px;" alt="Global Life Logo">
+        </div>
+        <h1 style="font-size: 32px; color: #2263fc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; font-weight: bold;">CERTIFICADO DE APROBACIÓN</h1>
+        <p style="font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Global Life IPS / Portal de Capacitación Continua</p>
+        <hr style="border: 0; height: 2px; background: #2263fc; margin: 25px auto; width: 80%;">
+        <p style="font-size: 16px; margin-top: 20px;">Hace constar que:</p>
+        <h2 id="certNombreUsuario" style="font-size: 28px; color: #0f172a; margin: 15px 0; font-weight: bold; text-transform: uppercase;">[NOMBRE DEL COLABORADOR]</h2>
+        <p style="font-size: 15px; color: #475569; margin-bottom: 25px;">Identificado(a) con C.C. N° <strong id="certIdentificacion">[CEDULA]</strong></p>
+        <p style="font-size: 16px; line-height: 1.6;">Ha completado y aprobado satisfactoriamente el módulo de capacitación en:</p>
+        <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin: 20px auto; width: 85%;">
+          <h3 id="certNombreCapacitacion" style="font-size: 22px; color: #2956b1; margin: 0; font-weight: bold;">[NOMBRE DE LA CAPACITACIÓN]</h3>
+        </div>
+        <p style="font-size: 14px; color: #475569; margin-top: 15px;">
+          Calificación obtenida: <strong id="certCalificacion" style="color: #16a34a;">100%</strong>
+        </p>
+        <div style="margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 40px;">
+          <div style="text-align: center; width: 40%;">
+            <div style="border-bottom: 1px solid #94a3b8; margin-bottom: 5px;"></div>
+            <p style="font-size: 12px; font-weight: bold; margin: 0; color: #334155;">Gestión de Talento Humano</p>
+            <p style="font-size: 10px; color: #64748b; margin: 0;">Global Life IPS</p>
+          </div>
+          <div style="text-align: center; width: 40%;">
+            <p style="font-size: 12px; color: #334155; margin-bottom: 5px;">Expedido el:</p>
+            <p id="certFechaExpedicion" style="font-size: 13px; font-weight: bold; color: #0f172a; margin: 0;">[FECHA]</p>
+          </div>
+        </div>
+        <div style="margin-top: 30px; font-size: 10px; color: #94a3b8;">
+          Documento generado automáticamente por la Plataforma de Capacitaciones Global Life.
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwXS1EURzJUUWLIdkAkSa57T8dj6qyZD95ivtz0yE5Tv3qOkcgNYRMVK4EnsQ3WhbpC/exec";//310720261355
+
+        let listaCapacitacionesGlobal = [];
+        let usuarioPuedeModificar = false;
+        let usuarioIdentificacionGlobal = "";
+        let examenActualGlobal = null;
+        let indicePreguntaActual = 0;
+        let respuestasUsuarioMap = {};
+        let temporizadorInterval = null;
+        let tiempoRestante = 60;
+        let cacheCapacitacionesUsuario = null;
+
+        document.getElementById('cantPregExamen').addEventListener('change', function() {
+            let cant = parseInt(this.value) || 1;
+            let valor = (100 / cant).toFixed(2);
+            document.getElementById('valorPorcentual').value = valor + "% por cada acierto";
+        });
+
+        document.getElementById('formLogin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('inputUsuario').value.trim();
+            const password = document.getElementById('inputPassword').value.trim();
+            const salida = document.getElementById('resultadoLogin');
+
+            salida.innerHTML = `<div class="alert alert-info py-2 text-center small"><i class="fas fa-spinner fa-spin me-2"></i> Verificando credenciales...</div>`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'verificarAdmin', usuario: usuario, password: password })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    document.getElementById('cardLogin').classList.add('d-none');
+                    document.getElementById('nombreAdminLogueado').innerText = res.nombre;
+                    document.getElementById('nombreUsuarioLogueado').innerText = res.nombre;
+                    usuarioIdentificacionGlobal = res.identificacion;
+
+                    if (res.esAdmin) {
+                        usuarioPuedeModificar = res.puedeModificar;
+                        const seccionSelector = document.getElementById('seccionSelectorModificacion');
+                        if (usuarioPuedeModificar) {
+                            seccionSelector.classList.remove('d-none');
+                            cargarListaCapacitacionesParaModificar();
+                        } else {
+                            seccionSelector.classList.add('d-none');
+                        }
+                        document.getElementById('btnVolverAdmin').classList.remove('d-none');
+                        document.getElementById('cardPanelAdmin').classList.remove('d-none');
+                    } else {
+                        // CONTROL DE PERMISOS: Ocultar el botón "Panel Admin" para funcionarios estándar
+                        document.getElementById('btnVolverAdmin').classList.add('d-none');
+                        document.getElementById('cardPanelUsuario').classList.remove('d-none');
+                        cargarCapacitacionesParaUsuario();
+                    }
+                } else {
+                    salida.innerHTML = `<div class="alert alert-danger py-2 text-center small"><i class="fas fa-ban me-2"></i> ${res.error || 'Acceso denegado.'}</div>`;
+                }
+            })
+            .catch(err => {
+                salida.innerHTML = `<div class="alert alert-danger py-2 text-center small">Error de red: ${err}</div>`;
+            });
+        });
+
+        function cambiarVistaUsuario() {
+            document.getElementById('cardPanelAdmin').classList.add('d-none');
+            document.getElementById('cardPanelUsuario').classList.remove('d-none');
+            cargarCapacitacionesParaUsuario();
+        }
+
+        function regresarAlAdmin() {
+            document.getElementById('cardPanelUsuario').classList.add('d-none');
+            document.getElementById('cardPanelAdmin').classList.remove('d-none');
+        }
+
+        function cerrarSesion() {
+            cacheCapacitacionesUsuario = null;
+            listaCapacitacionesGlobal = [];
+            document.getElementById('formLogin').reset();
+            document.getElementById('resultadoLogin').innerHTML = "";
+            document.getElementById('cardLogin').classList.remove('d-none');
+            document.getElementById('cardPanelAdmin').classList.add('d-none');
+            document.getElementById('cardPanelUsuario').classList.add('d-none');
+        }
+
+        function renderizarCapacitacionesUsuario(capacitaciones) {
+            const contenedor = document.getElementById('contenedorListaCapacitacionesUsuario');
+            contenedor.innerHTML = "";
+
+            if(!capacitaciones || capacitaciones.length === 0) {
+                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones activas disponibles en este momento.</div></div>`;
+                return;
+            }
+
+            capacitaciones.forEach(cap => {
+                let sinIntentos = (cap.intentosPermitidos > 0 && cap.intentosRealizados >= cap.intentosPermitidos);
+                let etiquetaIntentos = cap.intentosPermitidos === 0 ? "Ilimitados" : `${cap.intentosRealizados} / ${cap.intentosPermitidos}`;
+
+                let bannerAprobado = "";
+                let botonExamenOAccion = "";
+
+                if (cap.yaAprobo) {
+                    bannerAprobado = `
+                        <div class="alert alert-success py-2 px-3 mb-3 rounded-3 d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-check-circle me-2"></i> <b>CAPACITACIÓN CULMINADA</b></span>
+                            <span class="badge bg-success fs-6">Nota: ${cap.ultimaNota || '100%'}</span>
+                        </div>
+                    `;
+                    
+                    let emiteCertificado = String(cap.generaCertificado).trim().toUpperCase();
+
+                    if (emiteCertificado === "SI") {
+                        botonExamenOAccion = `
+                            <button class="btn btn-success rounded-pill fw-bold w-100 shadow-sm" onclick="generarPDFCertificado('${cap.id}')">
+                                <i class="fas fa-file-pdf me-2"></i> Descargar Certificado PDF
+                            </button>
+                        `;
+                    } else {
+                        botonExamenOAccion = `
+                            <div class="alert alert-info text-center m-0 py-2 rounded-pill fw-bold text-primary small border-primary">
+                                <i class="fas fa-award me-1"></i> ¡Capacitación Aprobada Exitosamente!
+                            </div>
+                            <div class="text-center mt-1 text-muted small" style="font-size: 11px;">
+                                (Esta capacitación no emite certificado descargable)
+                            </div>
+                        `;
+                    }
+                } else {
+                    botonExamenOAccion = `
+                        <button id="btnExamen_${cap.id}" class="btn ${sinIntentos ? 'btn-secondary' : 'btn-success'} rounded-pill fw-bold w-100" disabled onclick="iniciarExamen('${cap.id}')">
+                            <i class="fas fa-file-alt me-2"></i> ${sinIntentos ? 'Intentos Agotados' : '2. Presentar Examen'}
+                        </button>
+                    `;
+                }
+
+                let cardHtml = `
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 rounded-4 h-100">
+                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                <div>
+                                    ${bannerAprobado}
+                                    <span class="badge bg-primary mb-2">${cap.categoria}</span>
+                                    <h5 class="fw-bold text-dark">${cap.nombre}</h5>
+                                    <p class="text-muted small mb-3">${cap.descripcion}</p>
+                                    <ul class="list-unstyled small text-secondary mb-3">
+                                        <li><i class="fas fa-clock me-2 text-primary"></i> Duración: ${cap.duracion} horas</li>
+                                        <li><i class="fas fa-user-tie me-2 text-primary"></i> Responsable: ${cap.responsable}</li>
+                                        <li><i class="fas fa-award me-2 text-primary"></i> Nota mínima: ${cap.notaMinima}%</li>
+                                        <li><i class="fas fa-question-circle me-2 text-primary"></i> Preguntas en examen: ${cap.cantidadPreguntasExamen}</li>
+                                        <li class="mt-2"><i class="fas fa-redo me-2 ${sinIntentos ? 'text-danger' : 'text-primary'}"></i> Intentos realizados: <span class="fw-bold ${sinIntentos ? 'text-danger' : 'text-dark'}">${etiquetaIntentos}</span></li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    ${!cap.yaAprobo ? `
+                                        <div class="d-grid gap-2 mb-2">
+                                            <a href="${cap.videoUrl || '#'}" target="_blank" class="btn btn-outline-danger rounded-pill fw-bold" onclick="habilitarExamen('${cap.id}', ${sinIntentos})">
+                                                <i class="fab fa-youtube me-2"></i> 1. Ver Video de Estudio
+                                            </a>
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="d-grid gap-2">
+                                        ${botonExamenOAccion}
+                                    </div>
+
+                                    ${!cap.yaAprobo ? `
+                                        <div class="form-text text-center mt-2 text-muted" style="font-size: 11px;" id="textoAyuda_${cap.id}">
+                                            ${sinIntentos ? '<span class="text-danger fw-bold"><i class="fas fa-ban me-1"></i> Has consumido el total de intentos permitidos.</span>' : 'Haz clic en ver video y márcalo como visto para habilitar el examen.'}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                contenedor.innerHTML += cardHtml;
+            });
+        }
+
+        function cargarCapacitacionesParaUsuario() {
+            regresarAListaCapacitaciones();
+
+            if (cacheCapacitacionesUsuario) {
+                renderizarCapacitacionesUsuario(cacheCapacitacionesUsuario);
+                return;
+            }
+
+            const contenedor = document.getElementById('contenedorListaCapacitacionesUsuario');
+            contenedor.innerHTML = `<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Cargando capacitaciones...</p></div>`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'obtenerCapacitacionesUsuario', identificacionUsuario: usuarioIdentificacionGlobal })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    cacheCapacitacionesUsuario = res.capacitaciones;
+                    renderizarCapacitacionesUsuario(cacheCapacitacionesUsuario);
+                } else {
+                    contenedor.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-danger text-center p-4">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                <p class="fw-bold mb-2">No se pudieron obtener las capacitaciones</p>
+                                <p class="small mb-3">${res.error || 'Error desconocido'}</p>
+                                <button class="btn btn-outline-danger btn-sm rounded-pill px-4" onclick="cacheCapacitacionesUsuario=null; cargarCapacitacionesParaUsuario();">Reintentar</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                contenedor.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger text-center p-4">
+                            <i class="fas fa-wifi fa-2x mb-2"></i>
+                            <p class="fw-bold mb-2">Error de conexión</p>
+                            <p class="small mb-3">${err.message || err}</p>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-4" onclick="cacheCapacitacionesUsuario=null; cargarCapacitacionesParaUsuario();">Reintentar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function habilitarExamen(capId, sinIntentos) {
+            if (sinIntentos) return;
+
+            const btnExamen = document.getElementById(`btnExamen_${capId}`);
+            const textoAyuda = document.getElementById(`textoAyuda_${capId}`);
+            
+            if (btnExamen) {
+                btnExamen.disabled = false;
+                btnExamen.classList.remove('btn-success');
+                btnExamen.classList.add('btn-primary', 'shadow');
+                textoAyuda.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Material visualizado. ¡Ya puedes presentar tu examen!</span>`;
+            }
+        }
+
+        function iniciarExamen(capId) {
+            const contenedorPreguntas = document.getElementById('contenedorPreguntaActual');
+            contenedorPreguntas.innerHTML = `<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Generando cuestionario aleatorio...</p></div>`;
+
+            document.getElementById('vistaListaCapacitaciones').classList.add('d-none');
+            document.getElementById('vistaExamenInteractivo').classList.remove('d-none');
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: 'obtenerExamenCapacitacion', 
+                    idCapacitacion: capId, 
+                    identificacionUsuario: usuarioIdentificacionGlobal 
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    examenActualGlobal = res;
+                    indicePreguntaActual = 0;
+                    respuestasUsuarioMap = {};
+                    document.getElementById('tituloExamenCap').textContent = `Evaluación: ${res.nombreCapacitacion}`;
+                    
+                    construirCuadrosNavegacion();
+                    mostrarPreguntaActual();
+                } else {
+                    contenedorPreguntas.innerHTML = `
+                        <div class="alert alert-danger p-4 text-center">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i> No es posible presentar el examen</h5>
+                            <p class="mb-3">${res.error}</p>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold" onclick="regresarAListaCapacitaciones()">Regresar al listado</button>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                contenedorPreguntas.innerHTML = `<div class="alert alert-danger">Error de red: ${err}</div>`;
+            });
+        }
+
+        function construirCuadrosNavegacion() {
+            const contenedorCuadros = document.getElementById('cuadrosNavegacionPreguntas');
+            contenedorCuadros.innerHTML = "";
+
+            examenActualGlobal.preguntas.forEach((p, idx) => {
+                let cuadro = document.createElement('div');
+                cuadro.className = `cuadro-pregunta ${idx === 0 ? 'actual' : ''}`;
+                cuadro.id = `cuadro_preg_${idx}`;
+                cuadro.textContent = idx + 1;
+                cuadro.onclick = function() {
+                    salvarRespuestaActual();
+                    indicePreguntaActual = idx;
+                    mostrarPreguntaActual();
+                };
+                contenedorCuadros.appendChild(cuadro);
+            });
+        }
+
+        function mostrarPreguntaActual() {
+            if (!examenActualGlobal) return;
+            const p = examenActualGlobal.preguntas[indicePreguntaActual];
+            const contenedor = document.getElementById('contenedorPreguntaActual');
+
+            let opcionesHtml = "";
+            p.opciones.forEach(op => {
+                let seleccionada = respuestasUsuarioMap[indicePreguntaActual] === op ? 'checked' : '';
+                opcionesHtml += `
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="opcionRespuesta" value="${op}" id="op_${p.id}_${op}" ${seleccionada} onchange="registrarRespuestaSeleccionada('${op}')">
+                        <label class="form-check-label text-dark fs-6" for="op_${p.id}_${op}">
+                            ${op}
+                        </label>
                     </div>
                 `;
             });
 
-            kpiContainer.innerHTML = htmlCards;
+            contenedor.innerHTML = `
+                <div class="p-4 border rounded-4 bg-light">
+                    <span class="badge bg-secondary mb-2">Pregunta ${indicePreguntaActual + 1} de ${examenActualGlobal.preguntas.length}</span>
+                    <h5 class="fw-bold text-dark mb-4">${p.pregunta}</h5>
+                    <div class="ps-2">
+                        ${opcionesHtml}
+                    </div>
+                </div>
+            `;
+
+            actualizarEstadoCuadros();
+            actualizarBotonesNavegacion();
+            reiniciarTemporizador();
         }
 
-        function actualizarGraficos(data) {
-            const cargosCount = {};
-            const listaCount = {};
-            const interesadosCargoCount = {}; // Nuevo contador
+        function registrarRespuestaSeleccionada(valor) {
+            respuestasUsuarioMap[indicePreguntaActual] = valor;
+            let cuadro = document.getElementById(`cuadro_preg_${indicePreguntaActual}`);
+            if (cuadro) cuadro.classList.add('respondida');
+        }
 
-            data.forEach(row => {
-                let cargo = (row['Cargo'] || 'Desconocido').trim();
-                let lista = (row['LISTA'] || 'Sin clasificar').trim();
+        function salvarRespuestaActual() {
+            const radioSeleccionado = document.querySelector('input[name="opcionRespuesta"]:checked');
+            if (radioSeleccionado) {
+                respuestasUsuarioMap[indicePreguntaActual] = radioSeleccionado.value;
+                let cuadro = document.getElementById(`cuadro_preg_${indicePreguntaActual}`);
+                if (cuadro) cuadro.classList.add('respondida');
+            }
+        }
 
-                cargosCount[cargo] = (cargosCount[cargo] || 0) + 1;
-                listaCount[lista] = (listaCount[lista] || 0) + 1;
-                
-                // Lógica para el nuevo gráfico (Filtramos solo los 'INTERESADOS')
-                if(lista.toUpperCase() === 'INTERESADO') {
-                    interesadosCargoCount[cargo] = (interesadosCargoCount[cargo] || 0) + 1;
+        function actualizarEstadoCuadros() {
+            examenActualGlobal.preguntas.forEach((p, idx) => {
+                let cuadro = document.getElementById(`cuadro_preg_${idx}`);
+                if (cuadro) {
+                    cuadro.classList.remove('actual');
+                    if (idx === indicePreguntaActual) {
+                        cuadro.classList.add('actual');
+                    }
                 }
             });
-
-            renderChartCargo(Object.keys(cargosCount), Object.values(cargosCount));
-            renderChartLista(Object.keys(listaCount), Object.values(listaCount));
-            renderChartInteresados(Object.keys(interesadosCargoCount), Object.values(interesadosCargoCount)); // Renderizamos nuevo gráfico
         }
 
-        function actualizarTabla() {
-            const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '';
-            
-            const estadoFiltro = document.getElementById('listaFilter').value;
-            
-            const tableData = currentFilteredData.filter(row => {
-                if(estadoFiltro === 'TODOS') return true;
-                let estadoFila = (row['LISTA'] || 'Sin clasificar').trim();
-                return estadoFila === estadoFiltro;
+        function actualizarBotonesNavegacion() {
+            const btnAnterior = document.getElementById('btnAnteriorPregunta');
+            const btnSiguiente = document.getElementById('btnSiguientePregunta');
+            const btnFinalizar = document.getElementById('btnFinalizarExamen');
+
+            if (indicePreguntaActual === 0) {
+                btnAnterior.classList.add('d-none');
+            } else {
+                btnAnterior.classList.remove('d-none');
+            }
+
+            if (indicePreguntaActual === examenActualGlobal.preguntas.length - 1) {
+                btnSiguiente.classList.add('d-none');
+                btnFinalizar.classList.remove('d-none');
+            } else {
+                btnSiguiente.classList.remove('d-none');
+                btnFinalizar.classList.add('d-none');
+            }
+        }
+
+        function navegarPregunta(direccion) {
+            salvarRespuestaActual();
+            let nuevoIndice = indicePreguntaActual + direccion;
+            if (nuevoIndice >= 0 && nuevoIndice < examenActualGlobal.preguntas.length) {
+                indicePreguntaActual = nuevoIndice;
+                mostrarPreguntaActual();
+            }
+        }
+
+        function reiniciarTemporizador() {
+            if (temporizadorInterval) clearInterval(temporizadorInterval);
+            tiempoRestante = 60;
+            const badgeCronometro = document.getElementById('cronometroExamen');
+            badgeCronometro.innerHTML = `<i class="fas fa-clock me-1"></i> ${tiempoRestante}s`;
+
+            temporizadorInterval = setInterval(() => {
+                tiempoRestante--;
+                badgeCronometro.innerHTML = `<i class="fas fa-clock me-1"></i> ${tiempoRestante}s`;
+                
+                if (tiempoRestante <= 0) {
+                    clearInterval(temporizadorInterval);
+                    if (indicePreguntaActual < examenActualGlobal.preguntas.length - 1) {
+                        navegarPregunta(1);
+                    } else {
+                        confirmarEnvioExamen();
+                    }
+                }
+            }, 1000);
+        }
+
+        function confirmarEnvioExamen() {
+            salvarRespuestaActual();
+            if (temporizadorInterval) clearInterval(temporizadorInterval);
+
+            let totalPreguntas = examenActualGlobal.preguntas.length;
+            let respondidas = Object.keys(respuestasUsuarioMap).length;
+
+            if (respondidas < totalPreguntas) {
+                if (!confirm(`Tienes ${totalPreguntas - respondidas} preguntas sin responder. ¿Deseas enviar el examen de todos modos?`)) {
+                    reiniciarTemporizador();
+                    return;
+                }
+            }
+
+            let respuestasFormato = [];
+            examenActualGlobal.preguntas.forEach((p, idx) => {
+                respuestasFormato.push({
+                    idPregunta: p.id,
+                    seleccionada: respuestasUsuarioMap[idx] || "",
+                    correcta: p.respuestaCorrecta
+                });
             });
 
-            if (tableData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay registros para este filtro</td></tr>';
+            const dataEnvio = {
+                identificacionUsuario: usuarioIdentificacionGlobal,
+                idCapacitacion: examenActualGlobal.preguntas[0] ? examenActualGlobal.preguntas[0].idCap : '',
+                notaMinima: examenActualGlobal.notaMinima,
+                respuestas: respuestasFormato
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'calificarExamen', data: dataEnvio })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    cacheCapacitacionesUsuario = null;
+                    let mensaje = `Calificación obtenida: ${res.calificacion}%\nNota mínima requerida: ${examenActualGlobal.notaMinima}%\n\n`;
+                    if (res.aprueba) {
+                        alert(mensaje + '¡FELICIDADES! Has aprobado la capacitación exitosamente.');
+                    } else {
+                        alert(mensaje + 'Lo sentimos, no alcanzaste la nota mínima. Reprobado.');
+                    }
+                    cargarCapacitacionesParaUsuario();
+                } else {
+                    alert('Error al calificar: ' + res.error);
+                }
+            })
+            .catch(err => alert('Error de red: ' + err));
+        }
+
+        function regresarAListaCapacitaciones() {
+            if (temporizadorInterval) clearInterval(temporizadorInterval);
+            document.getElementById('vistaExamenInteractivo').classList.add('d-none');
+            document.getElementById('vistaListaCapacitaciones').classList.remove('d-none');
+        }
+
+        function generarPDFCertificado(idCapacitacion) {
+            alert('Generando Certificado PDF...');
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'obtenerDatosCertificado',
+                    identificacionUsuario: usuarioIdentificacionGlobal,
+                    idCapacitacion: idCapacitacion
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    const d = res.data;
+
+                    document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
+                    document.getElementById('certIdentificacion').textContent = d.identificacion;
+                    document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
+                    document.getElementById('certCalificacion').textContent = d.calificacion;
+                    document.getElementById('certFechaExpedicion').textContent = d.fecha;
+
+                    const elementoPDF = document.getElementById('certificadoPDF');
+
+                    const opciones = {
+                        margin:       10,
+                        filename:     `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2, useCORS: true },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                    };
+
+                    html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+                        alert('¡El certificado ha sido descargado exitosamente!');
+                    });
+                } else {
+                    alert('Error: ' + (res.error || 'No se pudieron obtener los datos del certificado.'));
+                }
+            })
+            .catch(err => alert('Error de red al generar PDF: ' + err));
+        }
+
+        function cargarListaCapacitacionesParaModificar() {
+            if (listaCapacitacionesGlobal.length > 0) {
+                poblarSelectModificacion(listaCapacitacionesGlobal);
                 return;
             }
 
-            tableData.forEach(row => {
-                const tr = document.createElement('tr');
-                
-                let doc = row['Documento'] || '';
-                let nombre = row['Nombre Completo'] || '';
-                let cargo = row['Cargo'] || '';
-                let celular = row['Telefono'] || '';
-                let lista = row['LISTA'] || 'Sin clasificar';
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'obtenerCapacitaciones' })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    listaCapacitacionesGlobal = res.capacitaciones;
+                    poblarSelectModificacion(listaCapacitacionesGlobal);
+                }
+            })
+            .catch(err => console.error("Error al cargar listado:", err));
+        }
 
-                tr.innerHTML = `
-                    <td>${doc}</td>
-                    <td>${nombre}</td>
-                    <td>${cargo}</td>
-                    <td>${celular}</td>
-                    <td>${lista}</td>
-                `;
-                tbody.appendChild(tr);
+        function poblarSelectModificacion(capacitaciones) {
+            const select = document.getElementById('selectCapacitacionMod');
+            select.innerHTML = '<option value="">-- Crear una nueva capacitación --</option>';
+            capacitaciones.forEach(cap => {
+                let opt = document.createElement('option');
+                opt.value = cap.id;
+                opt.textContent = `[${cap.codigo}] ${cap.nombre} (${cap.categoria})`;
+                select.appendChild(opt);
             });
         }
 
-        function exportarCSV() {
-            let csv = [];
-            let rows = document.querySelectorAll("#dataTable tr");
-            
-            for (let i = 0; i < rows.length; i++) {
-                let row = [], cols = rows[i].querySelectorAll("td, th");
-                for (let j = 0; j < cols.length; j++) {
-                    let data = cols[j].innerText.replace(/"/g, '""');
-                    row.push('"' + data + '"');
-                }
-                csv.push(row.join(","));
+        function cargarDatosCapacitacionSeleccionada() {
+            const idSeleccionado = document.getElementById('selectCapacitacionMod').value;
+            const editIdInput = document.getElementById('editCapId');
+            const tituloAccion = document.getElementById('tituloFormAccion');
+            const btnAccion = document.getElementById('btnAccionForm');
+            const contYoutube = document.getElementById('contenedorUrlYoutube');
+
+            if (!idSeleccionado) {
+                editIdInput.value = "";
+                tituloAccion.textContent = "Información General de la Capacitación";
+                btnAccion.innerHTML = '<i class="fas fa-save me-2"></i> Guardar Capacitación y Examen';
+                contYoutube.style.display = "block";
+                document.getElementById('formCapacitacion').reset();
+                document.getElementById('catCap').value = "Capacitación";
+                document.getElementById('notaMin').value = 70;
+                document.getElementById('intentosPermitidos').value = "1";
+                document.getElementById('generaCertificado').value = "SI";
+                document.getElementById('cantPregExamen').value = "10";
+                document.getElementById('valorPorcentual').value = "10.00% por cada acierto";
+                return;
             }
 
-            let csvFile = new Blob(["\ufeff" + csv.join("\n")], {type: "text/csv;charset=utf-8;"});
-            let downloadLink = document.createElement("a");
-            downloadLink.download = "Listado_Filtrado_Dashboard.csv";
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
+            const capEncontrada = listaCapacitacionesGlobal.find(c => String(c.id).trim() === String(idSeleccionado).trim());
+            if (capEncontrada) {
+                editIdInput.value = capEncontrada.id;
+                tituloAccion.textContent = `Modificando Capacitación: ${capEncontrada.nombre}`;
+                btnAccion.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Actualizar Capacitación y Examen';
+                contYoutube.style.display = "none";
 
-        function renderChartCargo(labels, data) {
-            const ctx = document.getElementById('chartCargo').getContext('2d');
-            if(chartCargoInstance) chartCargoInstance.destroy(); 
-            chartCargoInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Llamadas por Cargo',
-                        data: data,
-                        backgroundColor: ['#4361ee', '#3f37c9', '#4895ef'],
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Distribución por Cargo' } }
+                document.getElementById('nombreCap').value = capEncontrada.nombre;
+                document.getElementById('codigoCap产').value = capEncontrada.codigo;
+                
+                const selectCat = document.getElementById('catCap');
+                if (capEncontrada.categoria) {
+                    selectCat.value = capEncontrada.categoria;
+                } else {
+                    selectCat.value = "Capacitación";
                 }
-            });
+
+                document.getElementById('respCap').value = capEncontrada.responsable;
+                document.getElementById('descCap').value = capEncontrada.descripcion;
+                document.getElementById('durCap').value = capEncontrada.duracion;
+                document.getElementById('notaMin').value = capEncontrada.notaMinima;
+                document.getElementById('intentosPermitidos').value = capEncontrada.intentosPermitidos;
+                document.getElementById('generaCertificado').value = capEncontrada.generaCertificado || 'SI';
+                document.getElementById('cantPregExamen').value = capEncontrada.cantidadPreguntasExamen;
+
+                let cant = parseInt(capEncontrada.cantidadPreguntasExamen) || 1;
+                let valor = (100 / cant).toFixed(2);
+                document.getElementById('valorPorcentual').value = valor + "% por cada acierto";
+            }
         }
 
-        function renderChartLista(labels, data) {
-            const ctx = document.getElementById('chartLista').getContext('2d');
-            if(chartListaInstance) chartListaInstance.destroy();
-            chartListaInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: [
-                            '#4cc9f0', '#4361ee', '#f72585', '#b5179e', 
-                            '#7209b7', '#3f37c9', '#4895ef', '#cccccc'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
-                        title: { display: true, text: 'Estado de Lista' }
+        document.getElementById('formCapacitacion').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const idEdicion = document.getElementById('editCapId').value;
+            
+            const data = {
+                id: idEdicion,
+                nombre: document.getElementById('nombreCap').value,
+                codigo: document.getElementById('codigoCap').value,
+                categoria: document.getElementById('catCap').value,
+                responsable: document.getElementById('respCap').value,
+                descripcion: document.getElementById('descCap').value,
+                duracion: document.getElementById('durCap').value,
+                notaMinima: document.getElementById('notaMin').value,
+                intentosPermitidos: document.getElementById('intentosPermitidos').value,
+                generaCertificado: document.getElementById('generaCertificado').value,
+                cantidadPreguntasExamen: document.getElementById('cantPregExamen').value,
+                youtubeUrl: document.getElementById('ytUrl') ? document.getElementById('ytUrl').value : '',
+                estado: 'Activa'
+            };
+
+            const btn = document.getElementById('btnAccionForm');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Procesando...';
+
+            const accionEnvio = idEdicion ? 'actualizarCapacitacion' : 'crearCapacitacionConMaterial';
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: accionEnvio, data: data })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    cacheCapacitacionesUsuario = null;
+                    listaCapacitacionesGlobal = [];
+                    if (idEdicion) {
+                        alert('¡Capacitación y examen actualizados exitosamente!');
+                    } else {
+                        alert('¡Capacitación creada exitosamente con ID: ' + res.id + '!');
+                        document.getElementById('formCapacitacion').reset();
+                        document.getElementById('catCap').value = "Capacitación";
+                        document.getElementById('valorPorcentual').value = "10.00% por cada acierto";
                     }
+                    if (usuarioPuedeModificar) cargarListaCapacitacionesParaModificar();
+                } else {
+                    alert('Error: ' + res.error);
                 }
+                btn.disabled = false;
+                btn.innerHTML = idEdicion ? '<i class="fas fa-sync-alt me-2"></i> Actualizar Capacitación y Examen' : '<i class="fas fa-save me-2"></i> Guardar Capacitación y Examen';
+            })
+            .catch(err => {
+                alert('Error de red: ' + err);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i> Guardar Capacitación y Examen';
             });
-        }
+        });
 
-        // Nueva función para el gráfico de pastel de interesados por cargo
-        function renderChartInteresados(labels, data) {
-            const ctx = document.getElementById('chartInteresadosCargo').getContext('2d');
-            if(chartInteresadosInstance) chartInteresadosInstance.destroy();
-            chartInteresadosInstance = new Chart(ctx, {
-                type: 'pie', // Gráfico de Biscocho/Pastel
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: [
-                            '#10b981', '#fb8500', '#ffb703', '#8ecae6', 
-                            '#219ebc', '#023047', '#ff595e', '#8ac926'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
-                        title: { display: true, text: 'Interesados por Cargo' }
+        async function procesarExcelPorLotes() {
+            const fileInput = document.getElementById('excelFile');
+            const salida = document.getElementById('resultadoSalida');
+            
+            if(fileInput.files.length === 0) {
+                alert('Por favor selecciona un archivo Excel primero.');
+                return;
+            }
+
+            const btn = document.getElementById('btnProcesar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Leyendo archivo...';
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+
+                    if(jsonRows.length === 0) {
+                        salida.innerHTML = `<div class="alert alert-danger">El archivo Excel está vacío.</div>`;
+                        restaurarBtn(btn);
+                        return;
                     }
+
+                    salida.innerHTML = `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i> Procesando y preparando preguntas...</div>`;
+
+                    let listaPreguntasLote = [];
+
+                    for (let i = 0; i < jsonRows.length; i++) {
+                        let row = jsonRows[i];
+                        let cleanRow = {};
+                        Object.keys(row).forEach(key => {
+                            let cleanKey = key.replace(/[\u00A0\s]+/g, '').toLowerCase();
+                            cleanRow[cleanKey] = row[key];
+                        });
+
+                        let pregTexto = cleanRow['pregunta'] || '';
+                        let respCorrecta = cleanRow['respuestacorrecta'] || cleanRow['respuesta_correcta'] || '';
+                        let tipoPreg = cleanRow['tipo'] || 'Unica';
+                        let cat = cleanRow['categoria'] || 'Capacitación';
+                        let dif = cleanRow['dificultad'] || 'Media';
+                        let punt = cleanRow['puntaje'] || 5;
+
+                        let opcionesRaw = cleanRow['opcionesjson'] || cleanRow['opciones_json'] || '';
+                        let opcionesArr = [];
+
+                        if (typeof opcionesRaw === 'string') {
+                            if (opcionesRaw.includes(';')) {
+                                opcionesArr = opcionesRaw.split(';').map(o => o.trim());
+                            } else if (opcionesRaw.startsWith('[')) {
+                                try { opcionesArr = JSON.parse(opcionesRaw); } catch(err) { opcionesArr = []; }
+                            } else {
+                                opcionesArr = opcionesRaw.split(',').map(o => o.trim());
+                            }
+                        } else if (Array.isArray(opcionesRaw)) {
+                            opcionesArr = opcionesRaw;
+                        }
+
+                        if (!pregTexto || pregTexto.toString().trim() === '') continue;
+
+                        listaPreguntasLote.push({
+                            pregunta: pregTexto.toString().trim(),
+                            tipo: tipoPreg.toString().trim(),
+                            opciones: opcionesArr,
+                            respuestaCorrecta: respCorrecta.toString().trim(),
+                            puntaje: parseInt(punt) || 5,
+                            categoria: cat.toString().trim(),
+                            dificultad: dif.toString().trim()
+                        });
+                    }
+
+                    if (listaPreguntasLote.length === 0) {
+                        salida.innerHTML = `<div class="alert alert-warning">No se encontraron filas con preguntas válidas.</div>`;
+                        restaurarBtn(btn);
+                        return;
+                    }
+
+                    salida.innerHTML = `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i> Guardando ${listaPreguntasLote.length} preguntas en un solo paso...</div>`;
+
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'guardarPreguntasLote', data: listaPreguntasLote })
+                    });
+                    const jsonRes = await res.json();
+
+                    if(jsonRes.success) {
+                        salida.innerHTML = `
+                            <div class="alert alert-success">
+                                <h5><i class="fas fa-check-circle me-2"></i> ¡Carga Masiva Exitosa!</h5>
+                                <p class="mb-0">Se han guardado correctamente <strong>${jsonRes.guardadas} preguntas</strong> en la hoja <code>Banco_Preguntas</code> en tiempo récord.</p>
+                            </div>
+                        `;
+                        document.getElementById('excelFile').value = '';
+                    } else {
+                        salida.innerHTML = `<div class="alert alert-danger">Error al guardar el lote: ${jsonRes.error}</div>`;
+                    }
+                } catch (error) {
+                    salida.innerHTML = `<div class="alert alert-danger">Error procesando el archivo: ${error.message}</div>`;
                 }
-            });
+                restaurarBtn(btn);
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        // Script para insertar el logo dinámicamente
-        window.addEventListener('load', function() {
-            const logo = document.createElement('img');
-            logo.src = 'https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8';
-            logo.alt = 'Logo Empresa';
-            logo.style.display = 'block';
-            logo.style.margin = '0 auto 20px auto';
-            logo.style.maxWidth = '200px';
-            const h2 = document.querySelector('h2');
-            document.body.insertBefore(logo, h2);
+        function restaurarBtn(btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload me-2"></i> Procesar y Subir al Banco';
+        }
+
+        document.getElementById('formPreguntaManual').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const opcionesArray = document.getElementById('mOpciones').value.split(';').map(o => o.trim());
+
+            const data = {
+                pregunta: document.getElementById('mPregunta').value,
+                tipo: document.getElementById('mTipo').value,
+                opciones: opcionesArray,
+                respuestaCorrecta: document.getElementById('mRespuesta').value,
+                puntaje: parseInt(document.getElementById('mPuntaje').value),
+                categoria: document.getElementById('mCategoria').value,
+                dificultad: 'Media'
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'crearPreguntaIndividual', data: data })
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.success) {
+                    alert('¡Pregunta guardada con éxito en el Banco!');
+                    document.getElementById('formPreguntaManual').reset();
+                } else {
+                    alert('Error al guardar: ' + response.error);
+                }
+            })
+            .catch(err => alert('Error de red: ' + err));
         });
     </script>
 </body>
