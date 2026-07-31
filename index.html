@@ -172,7 +172,7 @@
                 <!-- NAVEGACIÓN PRINCIPAL DE SECCIONES ADMINISTRATIVAS -->
                 <ul class="nav nav-pills mb-4 gap-2" id="navTabsAdmin" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active rounded-3 fw-bold px-4 py-2.5" id="pills-gestion-tab" data-bs-toggle="pill" data-bs-target="#pills-gestion" type="button" role="tab" onclick="precargarAreasUnicas()">
+                        <button class="nav-link active rounded-3 fw-bold px-4 py-2.5" id="pills-gestion-tab" data-bs-toggle="pill" data-bs-target="#pills-gestion" type="button" role="tab" onclick="precargarDatosAdmin()">
                             <i class="fas fa-tasks me-2"></i> Gestión de Capacitaciones
                         </button>
                     </li>
@@ -219,6 +219,8 @@
                                             <option value="Capacitación" selected>Capacitación</option>
                                             <option value="Inducción">Inducción</option>
                                             <option value="Psicología">Psicología</option>
+                                            <option value="Clima Laboral">Clima Laboral</option>
+                                            <option value="Acoso Laboral">Acoso Laboral</option>
                                             <option value="Otro">Otro</option>
                                         </select>
                                     </div>
@@ -314,7 +316,15 @@
                                 <div class="tab-pane fade show active" id="sub-masiva" role="tabpanel">
                                     <div class="p-4 border rounded-3 bg-white">
                                         <h6 class="text-success fw-bold mb-3"><i class="fas fa-cloud-upload-alt me-2"></i> Subir Plantilla de Cuestionario</h6>
-                                        <p class="text-muted small">Selecciona tu archivo <code>.xlsx</code> con las columnas de preguntas.</p>
+                                        <p class="text-muted small">Selecciona tu archivo <code>.xlsx</code> con las preguntas. El sistema anidará las preguntas a la capacitación seleccionada abajo.</p>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold text-primary"><i class="fas fa-link me-1"></i> Anidar a Capacitación:</label>
+                                            <select class="form-select form-select-sm" id="excelCapAnidada" required>
+                                                <option value="">-- Seleccione la capacitación correspondiente --</option>
+                                            </select>
+                                        </div>
+
                                         <div class="mb-3">
                                             <input type="file" class="form-control" id="excelFile" accept=".xlsx, .xls, .csv">
                                         </div>
@@ -332,20 +342,34 @@
                                                 <label class="form-label">Texto de la Pregunta</label>
                                                 <textarea class="form-control" id="mPregunta" rows="2" required></textarea>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label class="form-label">Tipo de Pregunta</label>
                                                 <select class="form-select" id="mTipo">
                                                     <option value="Unica">Opción Múltiple (Única respuesta)</option>
                                                     <option value="VerdaderoFalso">Verdadero / Falso</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4">
-                                                <label class="form-label">Categoría</label>
-                                                <input type="text" class="form-control" id="mCategoria" value="Capacitación" required>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold text-primary">Anidar a Capacitación</label>
+                                                <select class="form-select" id="mCapacitacionNombre" required>
+                                                    <option value="">-- Seleccione Capacitación --</option>
+                                                </select>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-4 d-none">
+                                                <label class="form-label">Categoría</label>
+                                                <input type="text" class="form-control" id="mCategoria" value="Capacitación">
+                                            </div>
+                                            <div class="col-md-6">
                                                 <label class="form-label">Puntaje</label>
                                                 <input type="number" class="form-control" id="mPuntaje" value="5" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Dificultad</label>
+                                                <select class="form-select" id="mDificultad">
+                                                    <option value="Media" selected>Media</option>
+                                                    <option value="Facil">Fácil</option>
+                                                    <option value="Alta">Alta</option>
+                                                </select>
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label">Opciones (Separadas por punto y coma ; )</label>
@@ -643,7 +667,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwZHVNzhF2EFYG4bxZ0794oIPNvH0Idl4HRYpjxTU8GWhihOmNNHCCiBh62HP3NaRJM/exec";//310720261550
+        const API_URL = "https://script.google.com/macros/s/AKfycbygRnj9UwAiPEUtDBlU49F_iRkB9wVqQPKg1urqDFN8hbemnZeJlT-xU_kYVInNffuB/exec";//310720261640
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
@@ -698,13 +722,12 @@
                         if (usuarioPuedeModificar) {
                             if (seccionSelector) seccionSelector.classList.remove('d-none');
                             if (liReportes) liReportes.classList.remove('d-none');
-                            cargarListaCapacitacionesParaModificar();
                         } else {
                             if (seccionSelector) seccionSelector.classList.add('d-none');
                             if (liReportes) liReportes.classList.add('d-none');
                         }
 
-                        precargarAreasUnicas();
+                        precargarDatosAdmin();
 
                         document.getElementById('btnVolverAdmin').classList.remove('d-none');
                         document.getElementById('cardPanelAdmin').classList.remove('d-none');
@@ -722,7 +745,11 @@
             });
         });
 
-        // --- FUNCIONES PARA OBTENER ÁREAS ÚNICAS ---
+        function precargarDatosAdmin(areasSeleccionadas = []) {
+            precargarAreasUnicas(areasSeleccionadas);
+            cargarListaCapacitacionesParaModificar();
+        }
+
         function precargarAreasUnicas(areasSeleccionadas = []) {
             const contenedor = document.getElementById('contenedorCheckboxesAreas');
             contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando áreas...</span>`;
@@ -769,7 +796,6 @@
                 contenedor.innerHTML += htmlCheckbox;
             });
         }
-        // -------------------------------------------
 
         document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -943,7 +969,6 @@
                     `;
                 }
 
-                // VALIDACIÓN ESTRICTA: Solo se muestran los botones si el enlace existe en la base de datos
                 let botonPdfHtml = "";
                 if (cap.pdfUrl && cap.pdfUrl.trim() !== "") {
                     botonPdfHtml = `
@@ -1001,14 +1026,12 @@
             });
         }
 
-        // --- VISOR DE PDF NATIVO GOOGLE DRIVE (CORREGIDO Y COMPATIBLE) ---
         function abrirVisorPDF(urlPdf) {
             document.getElementById('vistaListaCapacitaciones').classList.add('d-none');
             document.getElementById('vistaVisorPDF').classList.remove('d-none');
 
             let urlEmbed = urlPdf;
             if (urlPdf.includes('drive.google.com')) {
-                // Convertir cualquier enlace de Google Drive al formato de previsualización incrustable seguro
                 urlEmbed = urlPdf.replace('/view?usp=drivesdk', '/preview').replace('/edit?usp=sharing', '/preview');
                 if (!urlEmbed.includes('/preview')) {
                     let match = urlPdf.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -1017,7 +1040,6 @@
                     }
                 }
             }
-
             document.getElementById('iframePdfViewer').src = urlEmbed;
         }
 
@@ -1114,17 +1136,21 @@
             const contenedor = document.getElementById('contenedorPreguntaActual');
 
             let opcionesHtml = "";
-            p.opciones.forEach(op => {
-                let seleccionada = respuestasUsuarioMap[indicePreguntaActual] === op ? 'checked' : '';
-                opcionesHtml += `
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="opcionRespuesta" value="${op}" id="op_${p.id}_${op}" ${seleccionada} onchange="registrarRespuestaSeleccionada('${op}')">
-                        <label class="form-check-label text-dark fs-6" for="op_${p.id}_${op}">
-                            ${op}
-                        </label>
-                    </div>
-                `;
-            });
+            if (p.opciones && p.opciones.length > 0) {
+                p.opciones.forEach(op => {
+                    let seleccionada = respuestasUsuarioMap[indicePreguntaActual] === op ? 'checked' : '';
+                    opcionesHtml += `
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="opcionRespuesta" value="${op}" id="op_${p.id}_${op}" ${seleccionada} onchange="registrarRespuestaSeleccionada('${op}')">
+                            <label class="form-check-label text-dark fs-6" for="op_${p.id}_${op}">
+                                ${op}
+                            </label>
+                        </div>
+                    `;
+                });
+            } else {
+                opcionesHtml = `<div class="text-danger small">No hay opciones disponibles para esta pregunta.</div>`;
+            }
 
             contenedor.innerHTML = `
                 <div class="p-4 border rounded-4 bg-light">
@@ -1308,11 +1334,6 @@
         }
 
         function cargarListaCapacitacionesParaModificar() {
-            if (listaCapacitacionesGlobal.length > 0) {
-                poblarSelectModificacion(listaCapacitacionesGlobal);
-                return;
-            }
-
             fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'obtenerCapacitaciones' })
@@ -1322,6 +1343,7 @@
                 if(res.success) {
                     listaCapacitacionesGlobal = res.capacitaciones;
                     poblarSelectModificacion(listaCapacitacionesGlobal);
+                    poblarSelectsCapacitacionPreguntas(listaCapacitacionesGlobal);
                 }
             })
             .catch(err => console.error("Error al cargar listado:", err));
@@ -1329,6 +1351,7 @@
 
         function poblarSelectModificacion(capacitaciones) {
             const select = document.getElementById('selectCapacitacionMod');
+            if(!select) return;
             select.innerHTML = '<option value="">-- Crear una nueva capacitación --</option>';
             capacitaciones.forEach(cap => {
                 let opt = document.createElement('option');
@@ -1336,6 +1359,31 @@
                 opt.textContent = `[${cap.codigo}] ${cap.nombre} (${cap.categoria})`;
                 select.appendChild(opt);
             });
+        }
+
+        function poblarSelectsCapacitacionPreguntas(capacitaciones) {
+            const selectManual = document.getElementById('mCapacitacionNombre');
+            const selectMasivo = document.getElementById('excelCapAnidada');
+
+            if (selectManual) {
+                selectManual.innerHTML = '<option value="">-- Seleccione Capacitación --</option>';
+                capacitaciones.forEach(cap => {
+                    let opt = document.createElement('option');
+                    opt.value = cap.nombre; // Guardamos el nombre exacto de la capacitación
+                    opt.textContent = `${cap.nombre} (${cap.categoria})`;
+                    selectManual.appendChild(opt);
+                });
+            }
+
+            if (selectMasivo) {
+                selectMasivo.innerHTML = '<option value="">-- Seleccione la capacitación correspondiente --</option>';
+                capacitaciones.forEach(cap => {
+                    let opt = document.createElement('option');
+                    opt.value = cap.nombre;
+                    opt.textContent = `${cap.nombre} (${cap.categoria})`;
+                    selectMasivo.appendChild(opt);
+                });
+            }
         }
 
         function cargarDatosCapacitacionSeleccionada() {
@@ -1457,7 +1505,13 @@
         async function procesarExcelPorLotes() {
             const fileInput = document.getElementById('excelFile');
             const salida = document.getElementById('resultadoSalida');
+            const capAnidadaNombre = document.getElementById('excelCapAnidada').value;
             
+            if(!capAnidadaNombre) {
+                alert('Por favor seleccione la Capacitación a la cual se van anidar las preguntas.');
+                return;
+            }
+
             if(fileInput.files.length === 0) {
                 alert('Por favor selecciona un archivo Excel primero.');
                 return;
@@ -1500,6 +1554,7 @@
                         let tipoPreg = cleanRow['tipo'] || 'Unica';
                         let cat = cleanRow['categoria'] || 'Capacitación';
                         let punt = cleanRow['puntaje'] || 5;
+                        let dif = cleanRow['dificultad'] || 'Media';
                         let opcionesRaw = cleanRow['opcionesjson'] || cleanRow['opciones_json'] || '';
                         let opcionesArr = [];
 
@@ -1519,7 +1574,8 @@
                             respuestaCorrecta: respCorrecta.toString().trim(),
                             puntaje: parseInt(punt) || 5,
                             categoria: cat.toString().trim(),
-                            dificultad: 'Media'
+                            dificultad: dif.toString().trim(),
+                            nombreCapacitacion: capAnidadaNombre
                         });
                     }
 
@@ -1530,7 +1586,7 @@
                     const jsonRes = await res.json();
 
                     if(jsonRes.success) {
-                        salida.innerHTML = `<div class="alert alert-success">¡Carga Masiva Exitosa! Se guardaron <strong>${jsonRes.guardadas} preguntas</strong>.</div>`;
+                        salida.innerHTML = `<div class="alert alert-success">¡Carga Masiva Exitosa! Se guardaron <strong>${jsonRes.guardadas} preguntas</strong> anidadas a la capacitación <b>${capAnidadaNombre}</b>.</div>`;
                         document.getElementById('excelFile').value = '';
                     } else {
                         salida.innerHTML = `<div class="alert alert-danger">Error: ${jsonRes.error}</div>`;
@@ -1550,6 +1606,12 @@
 
         document.getElementById('formPreguntaManual').addEventListener('submit', function(e) {
             e.preventDefault();
+            const nombreCapSelected = document.getElementById('mCapacitacionNombre').value;
+            if(!nombreCapSelected) {
+                alert('Debe seleccionar la capacitación a la cual se anidará la pregunta.');
+                return;
+            }
+
             const opcionesArray = document.getElementById('mOpciones').value.split(';').map(o => o.trim());
 
             const data = {
@@ -1559,7 +1621,8 @@
                 respuestaCorrecta: document.getElementById('mRespuesta').value,
                 puntaje: parseInt(document.getElementById('mPuntaje').value),
                 categoria: document.getElementById('mCategoria').value,
-                dificultad: 'Media'
+                dificultad: document.getElementById('mDificultad').value,
+                nombreCapacitacion: nombreCapSelected
             };
 
             fetch(API_URL, {
@@ -1569,7 +1632,7 @@
             .then(res => res.json())
             .then(response => {
                 if(response.success) {
-                    alert('¡Pregunta guardada con éxito en el Banco!');
+                    alert('¡Pregunta guardada con éxito y anidada a la capacitación!');
                     document.getElementById('formPreguntaManual').reset();
                 } else {
                     alert('Error al guardar: ' + response.error);
