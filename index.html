@@ -172,7 +172,7 @@
                 <!-- NAVEGACIÓN PRINCIPAL DE SECCIONES ADMINISTRATIVAS -->
                 <ul class="nav nav-pills mb-4 gap-2" id="navTabsAdmin" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active rounded-3 fw-bold px-4 py-2.5" id="pills-gestion-tab" data-bs-toggle="pill" data-bs-target="#pills-gestion" type="button" role="tab">
+                        <button class="nav-link active rounded-3 fw-bold px-4 py-2.5" id="pills-gestion-tab" data-bs-toggle="pill" data-bs-target="#pills-gestion" type="button" role="tab" onclick="precargarAreasUnicas()">
                             <i class="fas fa-tasks me-2"></i> Gestión de Capacitaciones
                         </button>
                     </li>
@@ -218,6 +218,7 @@
                                         <select class="form-select" id="catCap" required>
                                             <option value="Capacitación" selected>Capacitación</option>
                                             <option value="Inducción">Inducción</option>
+                                            <option value="Psicología">Psicología</option>
                                             <option value="Otro">Otro</option>
                                         </select>
                                     </div>
@@ -230,6 +231,16 @@
                                         <label class="form-label small fw-semibold text-secondary">Descripción</label>
                                         <textarea class="form-control" id="descCap" rows="2" required></textarea>
                                     </div>
+
+                                    <!-- SECCIÓN DE SELECCIÓN MÚLTIPLE DE ÁREAS -->
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-primary"><i class="fas fa-users me-1"></i> Dirigido a las Áreas (Selección Múltiple)</label>
+                                        <div class="p-3 border rounded-3 bg-light" id="contenedorCheckboxesAreas" style="max-height: 160px; overflow-y: auto;">
+                                            <span class="text-muted small">Cargando áreas disponibles...</span>
+                                        </div>
+                                        <div class="form-text text-muted" style="font-size: 11px;">Si no seleccionas ninguna área, la capacitación no estará disponible para ningún colaborador.</div>
+                                    </div>
+
                                     <div class="col-md-3">
                                         <label class="form-label small fw-semibold text-secondary">Duración (Horas)</label>
                                         <input type="number" class="form-control" id="durCap" required>
@@ -269,8 +280,12 @@
                                         <input type="text" class="form-control bg-light text-success fw-bold" id="valorPorcentual" value="10.00% por cada acierto" readonly>
                                     </div>
                                     <div class="col-12" id="contenedorUrlYoutube">
-                                        <label class="form-label small fw-semibold text-danger"><i class="fab fa-youtube me-1"></i> Enlace de YouTube</label>
-                                        <input type="url" class="form-control" id="ytUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+                                        <label class="form-label small fw-semibold text-danger"><i class="fab fa-youtube me-1"></i> Enlace de YouTube (Video)</label>
+                                        <input type="url" class="form-control" id="ytUrl" placeholder="https://www.youtube.com/watch?v=...">
+                                    </div>
+                                    <div class="col-12" id="contenedorUrlPdf">
+                                        <label class="form-label small fw-semibold text-primary"><i class="fas fa-file-pdf me-1"></i> Enlace o URL del Documento PDF (Para visor web)</label>
+                                        <input type="url" class="form-control" id="pdfUrl" placeholder="https://... o enlace de Google Drive">
                                     </div>
                                 </div>
 
@@ -537,6 +552,20 @@
                 </div>
             </div>
 
+            <!-- VISTA DEL VISOR DE PDF NATIVO DE GOOGLE DRIVE -->
+            <div class="col-lg-10 d-none" id="vistaVisorPDF">
+                <div class="card shadow border-0 rounded-4 p-4 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                        <h5 class="fw-bold text-primary mb-0" id="tituloPdfModal"><i class="fas fa-file-pdf me-2"></i> Lectura de Documento PDF</h5>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="cerrarVisorPDF()"><i class="fas fa-arrow-left me-1"></i> Volver a Capacitaciones</button>
+                    </div>
+
+                    <div class="border rounded-3 p-2 bg-light text-center" style="height: 600px;">
+                        <iframe id="iframePdfViewer" src="" style="width: 100%; height: 100%; border: none;" allow="autoplay"></iframe>
+                    </div>
+                </div>
+            </div>
+
             <!-- VISTA DEL EXAMEN INTERACTIVO -->
             <div class="col-lg-10 d-none" id="vistaExamenInteractivo">
                 <div class="card shadow border-0 rounded-4 p-4 p-md-5 bg-white">
@@ -614,7 +643,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwEoVG7qbxYZk2kL3aBECdcz0uTEkwKTZR_eD5Gk__8AuOVf13OonctzW4GFfq8UiTe/exec";//310720261440
+        const API_URL = "https://script.google.com/macros/s/AKfycbwZHVNzhF2EFYG4bxZ0794oIPNvH0Idl4HRYpjxTU8GWhihOmNNHCCiBh62HP3NaRJM/exec";//310720261550
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
@@ -627,6 +656,7 @@
         let cacheCapacitacionesUsuario = null;
         let datosReporteGlobal = [];
         let datosUsuariosGlobal = [];
+        let areasUnicasGlobal = [];
 
         document.getElementById('cantPregExamen').addEventListener('change', function() {
             let cant = parseInt(this.value) || 1;
@@ -674,6 +704,8 @@
                             if (liReportes) liReportes.classList.add('d-none');
                         }
 
+                        precargarAreasUnicas();
+
                         document.getElementById('btnVolverAdmin').classList.remove('d-none');
                         document.getElementById('cardPanelAdmin').classList.remove('d-none');
                     } else {
@@ -689,6 +721,55 @@
                 salida.innerHTML = `<div class="alert alert-danger py-2 text-center small">Error de red: ${err}</div>`;
             });
         });
+
+        // --- FUNCIONES PARA OBTENER ÁREAS ÚNICAS ---
+        function precargarAreasUnicas(areasSeleccionadas = []) {
+            const contenedor = document.getElementById('contenedorCheckboxesAreas');
+            contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando áreas...</span>`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'obtenerAreasUnicas' })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    areasUnicasGlobal = res.areas;
+                    renderizarCheckboxesAreas(areasSeleccionadas);
+                } else {
+                    contenedor.innerHTML = `<span class="text-danger small">Error al cargar áreas.</span>`;
+                }
+            })
+            .catch(err => {
+                contenedor.innerHTML = `<span class="text-danger small">Error de red: ${err}</span>`;
+            });
+        }
+
+        function renderizarCheckboxesAreas(seleccionadas = []) {
+            const contenedor = document.getElementById('contenedorCheckboxesAreas');
+            contenedor.innerHTML = "";
+
+            if (!areasUnicasGlobal || areasUnicasGlobal.length === 0) {
+                contenedor.innerHTML = `<span class="text-muted small">No hay áreas registradas en el sistema.</span>`;
+                return;
+            }
+
+            let seleccionadasSet = new Set(seleccionadas.map(a => String(a).trim().toUpperCase()));
+
+            areasUnicasGlobal.forEach((area, idx) => {
+                let estaChecked = seleccionadasSet.has(String(area).trim().toUpperCase()) ? 'checked' : '';
+                let htmlCheckbox = `
+                    <div class="form-check mb-1">
+                        <input class="form-check-input check-area-cap" type="checkbox" value="${area}" id="check_area_${idx}" ${estaChecked}>
+                        <label class="form-check-label text-dark small fw-semibold" for="check_area_${idx}">
+                            ${area}
+                        </label>
+                    </div>
+                `;
+                contenedor.innerHTML += htmlCheckbox;
+            });
+        }
+        // -------------------------------------------
 
         document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -718,6 +799,7 @@
                     alert('¡Usuario registrado exitosamente en la plataforma!');
                     document.getElementById('formCrearUsuario').reset();
                     cargarTablaUsuarios();
+                    precargarAreasUnicas();
                 } else {
                     alert('Error: ' + res.error);
                 }
@@ -819,7 +901,7 @@
             contenedor.innerHTML = "";
 
             if(!capacitaciones || capacitaciones.length === 0) {
-                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones activas disponibles en este momento.</div></div>`;
+                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones asignadas y disponibles para tu área en este momento.</div></div>`;
                 return;
             }
 
@@ -851,16 +933,36 @@
                             <div class="alert alert-info text-center m-0 py-2 rounded-pill fw-bold text-primary small border-primary">
                                 <i class="fas fa-award me-1"></i> ¡Capacitación Aprobada Exitosamente!
                             </div>
-                            <div class="text-center mt-1 text-muted small" style="font-size: 11px;">
-                                (Esta capacitación no emite certificado descargable)
-                            </div>
                         `;
                     }
                 } else {
                     botonExamenOAccion = `
-                        <button id="btnExamen_${cap.id}" class="btn ${sinIntentos ? 'btn-secondary' : 'btn-success'} rounded-pill fw-bold w-100" disabled onclick="iniciarExamen('${cap.id}')">
-                            <i class="fas fa-file-alt me-2"></i> ${sinIntentos ? 'Intentos Agotados' : '2. Presentar Examen'}
+                        <button id="btnExamen_${cap.id}" class="btn ${sinIntentos ? 'btn-secondary' : 'btn-success'} rounded-pill fw-bold w-100" onclick="iniciarExamen('${cap.id}')">
+                            <i class="fas fa-file-alt me-2"></i> ${sinIntentos ? 'Intentos Agotados' : 'Presentar Examen'}
                         </button>
+                    `;
+                }
+
+                // VALIDACIÓN ESTRICTA: Solo se muestran los botones si el enlace existe en la base de datos
+                let botonPdfHtml = "";
+                if (cap.pdfUrl && cap.pdfUrl.trim() !== "") {
+                    botonPdfHtml = `
+                        <div class="d-grid gap-2 mb-2">
+                            <button class="btn btn-outline-primary rounded-pill fw-bold" onclick="abrirVisorPDF('${cap.pdfUrl}')">
+                                <i class="fas fa-file-pdf me-2"></i> 1. Leer Documento PDF
+                            </button>
+                        </div>
+                    `;
+                }
+
+                let botonVideoHtml = "";
+                if (cap.videoUrl && cap.videoUrl.trim() !== "") {
+                    botonVideoHtml = `
+                        <div class="d-grid gap-2 mb-2">
+                            <a href="${cap.videoUrl}" target="_blank" class="btn btn-outline-danger rounded-pill fw-bold">
+                                <i class="fab fa-youtube me-2"></i> Ver Video de Estudio
+                            </a>
+                        </div>
                     `;
                 }
 
@@ -877,29 +979,19 @@
                                         <li><i class="fas fa-clock me-2 text-primary"></i> Duración: ${cap.duracion} horas</li>
                                         <li><i class="fas fa-user-tie me-2 text-primary"></i> Responsable: ${cap.responsable}</li>
                                         <li><i class="fas fa-award me-2 text-primary"></i> Nota mínima: ${cap.notaMinima}%</li>
-                                        <li><i class="fas fa-question-circle me-2 text-primary"></i> Preguntas en examen: ${cap.cantidadPreguntasExamen}</li>
                                         <li class="mt-2"><i class="fas fa-redo me-2 ${sinIntentos ? 'text-danger' : 'text-primary'}"></i> Intentos realizados: <span class="fw-bold ${sinIntentos ? 'text-danger' : 'text-dark'}">${etiquetaIntentos}</span></li>
                                     </ul>
                                 </div>
 
                                 <div>
                                     ${!cap.yaAprobo ? `
-                                        <div class="d-grid gap-2 mb-2">
-                                            <a href="${cap.videoUrl || '#'}" target="_blank" class="btn btn-outline-danger rounded-pill fw-bold" onclick="habilitarExamen('${cap.id}', ${sinIntentos})">
-                                                <i class="fab fa-youtube me-2"></i> 1. Ver Video de Estudio
-                                            </a>
-                                        </div>
+                                        ${botonPdfHtml}
+                                        ${botonVideoHtml}
                                     ` : ''}
 
                                     <div class="d-grid gap-2">
                                         ${botonExamenOAccion}
                                     </div>
-
-                                    ${!cap.yaAprobo ? `
-                                        <div class="form-text text-center mt-2 text-muted" style="font-size: 11px;" id="textoAyuda_${cap.id}">
-                                            ${sinIntentos ? '<span class="text-danger fw-bold"><i class="fas fa-ban me-1"></i> Has consumido el total de intentos permitidos.</span>' : 'Haz clic en ver video y márcalo como visto para habilitar el examen.'}
-                                        </div>
-                                    ` : ''}
                                 </div>
                             </div>
                         </div>
@@ -907,6 +999,32 @@
                 `;
                 contenedor.innerHTML += cardHtml;
             });
+        }
+
+        // --- VISOR DE PDF NATIVO GOOGLE DRIVE (CORREGIDO Y COMPATIBLE) ---
+        function abrirVisorPDF(urlPdf) {
+            document.getElementById('vistaListaCapacitaciones').classList.add('d-none');
+            document.getElementById('vistaVisorPDF').classList.remove('d-none');
+
+            let urlEmbed = urlPdf;
+            if (urlPdf.includes('drive.google.com')) {
+                // Convertir cualquier enlace de Google Drive al formato de previsualización incrustable seguro
+                urlEmbed = urlPdf.replace('/view?usp=drivesdk', '/preview').replace('/edit?usp=sharing', '/preview');
+                if (!urlEmbed.includes('/preview')) {
+                    let match = urlPdf.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) {
+                        urlEmbed = `https://drive.google.com/file/d/${match[1]}/preview`;
+                    }
+                }
+            }
+
+            document.getElementById('iframePdfViewer').src = urlEmbed;
+        }
+
+        function cerrarVisorPDF() {
+            document.getElementById('iframePdfViewer').src = "";
+            document.getElementById('vistaVisorPDF').classList.add('d-none');
+            document.getElementById('vistaListaCapacitaciones').classList.remove('d-none');
         }
 
         function cargarCapacitacionesParaUsuario() {
@@ -930,44 +1048,12 @@
                     cacheCapacitacionesUsuario = res.capacitaciones;
                     renderizarCapacitacionesUsuario(cacheCapacitacionesUsuario);
                 } else {
-                    contenedor.innerHTML = `
-                        <div class="col-12">
-                            <div class="alert alert-danger text-center p-4">
-                                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
-                                <p class="fw-bold mb-2">No se pudieron obtener las capacitaciones</p>
-                                <p class="small mb-3">${res.error || 'Error desconocido'}</p>
-                                <button class="btn btn-outline-danger btn-sm rounded-pill px-4" onclick="cacheCapacitacionesUsuario=null; cargarCapacitacionesParaUsuario();">Reintentar</button>
-                            </div>
-                        </div>
-                    `;
+                    contenedor.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">No se pudieron obtener las capacitaciones.</div></div>`;
                 }
             })
             .catch(err => {
-                contenedor.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger text-center p-4">
-                            <i class="fas fa-wifi fa-2x mb-2"></i>
-                            <p class="fw-bold mb-2">Error de conexión</p>
-                            <p class="small mb-3">${err.message || err}</p>
-                            <button class="btn btn-outline-danger btn-sm rounded-pill px-4" onclick="cacheCapacitacionesUsuario=null; cargarCapacitacionesParaUsuario();">Reintentar</button>
-                        </div>
-                    </div>
-                `;
+                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">Error de conexión: ${err}</div></div>`;
             });
-        }
-
-        function habilitarExamen(capId, sinIntentos) {
-            if (sinIntentos) return;
-
-            const btnExamen = document.getElementById(`btnExamen_${capId}`);
-            const textoAyuda = document.getElementById(`textoAyuda_${capId}`);
-            
-            if (btnExamen) {
-                btnExamen.disabled = false;
-                btnExamen.classList.remove('btn-success');
-                btnExamen.classList.add('btn-primary', 'shadow');
-                textoAyuda.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> Material visualizado. ¡Ya puedes presentar tu examen!</span>`;
-            }
         }
 
         function iniciarExamen(capId) {
@@ -996,13 +1082,7 @@
                     construirCuadrosNavegacion();
                     mostrarPreguntaActual();
                 } else {
-                    contenedorPreguntas.innerHTML = `
-                        <div class="alert alert-danger p-4 text-center">
-                            <h5><i class="fas fa-exclamation-triangle me-2"></i> No es posible presentar el examen</h5>
-                            <p class="mb-3">${res.error}</p>
-                            <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold" onclick="regresarAListaCapacitaciones()">Regresar al listado</button>
-                        </div>
-                    `;
+                    contenedorPreguntas.innerHTML = `<div class="alert alert-danger p-4 text-center"><h5>Error</h5><p>${res.error}</p></div>`;
                 }
             })
             .catch(err => {
@@ -1050,9 +1130,7 @@
                 <div class="p-4 border rounded-4 bg-light">
                     <span class="badge bg-secondary mb-2">Pregunta ${indicePreguntaActual + 1} de ${examenActualGlobal.preguntas.length}</span>
                     <h5 class="fw-bold text-dark mb-4">${p.pregunta}</h5>
-                    <div class="ps-2">
-                        ${opcionesHtml}
-                    </div>
+                    <div class="ps-2">${opcionesHtml}</div>
                 </div>
             `;
 
@@ -1081,9 +1159,7 @@
                 let cuadro = document.getElementById(`cuadro_preg_${idx}`);
                 if (cuadro) {
                     cuadro.classList.remove('actual');
-                    if (idx === indicePreguntaActual) {
-                        cuadro.classList.add('actual');
-                    }
+                    if (idx === indicePreguntaActual) cuadro.classList.add('actual');
                 }
             });
         }
@@ -1093,11 +1169,8 @@
             const btnSiguiente = document.getElementById('btnSiguientePregunta');
             const btnFinalizar = document.getElementById('btnFinalizarExamen');
 
-            if (indicePreguntaActual === 0) {
-                btnAnterior.classList.add('d-none');
-            } else {
-                btnAnterior.classList.remove('d-none');
-            }
+            if (indicePreguntaActual === 0) btnAnterior.classList.add('d-none');
+            else btnAnterior.classList.remove('d-none');
 
             if (indicePreguntaActual === examenActualGlobal.preguntas.length - 1) {
                 btnSiguiente.classList.add('d-none');
@@ -1177,11 +1250,8 @@
                 if(res.success) {
                     cacheCapacitacionesUsuario = null;
                     let mensaje = `Calificación obtenida: ${res.calificacion}%\nNota mínima requerida: ${examenActualGlobal.notaMinima}%\n\n`;
-                    if (res.aprueba) {
-                        alert(mensaje + '¡FELICIDADES! Has aprobado la capacitación exitosamente.');
-                    } else {
-                        alert(mensaje + 'Lo sentimos, no alcanzaste la nota mínima. Reprobado.');
-                    }
+                    if (res.aprueba) alert(mensaje + '¡FELICIDADES! Has aprobado la capacitación exitosamente.');
+                    else alert(mensaje + 'Lo sentimos, no alcanzaste la nota mínima. Reprobado.');
                     cargarCapacitacionesParaUsuario();
                 } else {
                     alert('Error al calificar: ' + res.error);
@@ -1193,6 +1263,7 @@
         function regresarAListaCapacitaciones() {
             if (temporizadorInterval) clearInterval(temporizadorInterval);
             document.getElementById('vistaExamenInteractivo').classList.add('d-none');
+            document.getElementById('vistaVisorPDF').classList.add('d-none');
             document.getElementById('vistaListaCapacitaciones').classList.remove('d-none');
         }
 
@@ -1211,7 +1282,6 @@
             .then(res => {
                 if (res.success) {
                     const d = res.data;
-
                     document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
                     document.getElementById('certIdentificacion').textContent = d.identificacion;
                     document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
@@ -1219,20 +1289,19 @@
                     document.getElementById('certFechaExpedicion').textContent = d.fecha;
 
                     const elementoPDF = document.getElementById('certificadoPDF');
-
                     const opciones = {
-                        margin:       10,
-                        filename:     `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
-                        image:        { type: 'jpeg', quality: 0.98 },
-                        html2canvas:  { scale: 2, useCORS: true },
-                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                        margin: 10,
+                        filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
                     };
 
                     html2pdf().set(opciones).from(elementoPDF).save().then(() => {
                         alert('¡El certificado ha sido descargado exitosamente!');
                     });
                 } else {
-                    alert('Error: ' + (res.error || 'No se pudieron obtener los datos del certificado.'));
+                    alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
                 }
             })
             .catch(err => alert('Error de red al generar PDF: ' + err));
@@ -1274,13 +1343,11 @@
             const editIdInput = document.getElementById('editCapId');
             const tituloAccion = document.getElementById('tituloFormAccion');
             const btnAccion = document.getElementById('btnAccionForm');
-            const contYoutube = document.getElementById('contenedorUrlYoutube');
 
             if (!idSeleccionado) {
                 editIdInput.value = "";
                 tituloAccion.textContent = "Información General de la Capacitación";
                 btnAccion.innerHTML = '<i class="fas fa-save me-2"></i> Guardar Capacitación y Examen';
-                contYoutube.style.display = "block";
                 document.getElementById('formCapacitacion').reset();
                 document.getElementById('catCap').value = "Capacitación";
                 document.getElementById('notaMin').value = 70;
@@ -1288,6 +1355,7 @@
                 document.getElementById('generaCertificado').value = "SI";
                 document.getElementById('cantPregExamen').value = "10";
                 document.getElementById('valorPorcentual').value = "10.00% por cada acierto";
+                precargarAreasUnicas([]);
                 return;
             }
 
@@ -1296,18 +1364,10 @@
                 editIdInput.value = capEncontrada.id;
                 tituloAccion.textContent = `Modificando Capacitación: ${capEncontrada.nombre}`;
                 btnAccion.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Actualizar Capacitación y Examen';
-                contYoutube.style.display = "none";
 
                 document.getElementById('nombreCap').value = capEncontrada.nombre;
                 document.getElementById('codigoCap').value = capEncontrada.codigo;
-                
-                const selectCat = document.getElementById('catCap');
-                if (capEncontrada.categoria) {
-                    selectCat.value = capEncontrada.categoria;
-                } else {
-                    selectCat.value = "Capacitación";
-                }
-
+                document.getElementById('catCap').value = capEncontrada.categoria || "Capacitación";
                 document.getElementById('respCap').value = capEncontrada.responsable;
                 document.getElementById('descCap').value = capEncontrada.descripcion;
                 document.getElementById('durCap').value = capEncontrada.duracion;
@@ -1319,6 +1379,16 @@
                 let cant = parseInt(capEncontrada.cantidadPreguntasExamen) || 1;
                 let valor = (100 / cant).toFixed(2);
                 document.getElementById('valorPorcentual').value = valor + "% por cada acierto";
+
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'obtenerAsignacionPorCapacitacion', idCapacitacion: capEncontrada.id })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    let areasAsig = res.success ? res.areasAsignadas : [];
+                    precargarAreasUnicas(areasAsig);
+                });
             }
         }
 
@@ -1326,6 +1396,10 @@
             e.preventDefault();
             const idEdicion = document.getElementById('editCapId').value;
             
+            let checkboxesAreas = document.querySelectorAll('.check-area-cap:checked');
+            let areasSeleccionadas = [];
+            checkboxesAreas.forEach(cb => areasSeleccionadas.push(cb.value));
+
             const data = {
                 id: idEdicion,
                 nombre: document.getElementById('nombreCap').value,
@@ -1339,6 +1413,8 @@
                 generaCertificado: document.getElementById('generaCertificado').value,
                 cantidadPreguntasExamen: document.getElementById('cantPregExamen').value,
                 youtubeUrl: document.getElementById('ytUrl') ? document.getElementById('ytUrl').value : '',
+                pdfUrl: document.getElementById('pdfUrl') ? document.getElementById('pdfUrl').value : '',
+                areas: areasSeleccionadas,
                 estado: 'Activa'
             };
 
@@ -1357,13 +1433,12 @@
                 if(res.success) {
                     cacheCapacitacionesUsuario = null;
                     listaCapacitacionesGlobal = [];
-                    if (idEdicion) {
-                        alert('¡Capacitación y examen actualizados exitosamente!');
-                    } else {
+                    if (idEdicion) alert('¡Capacitación y examen actualizados exitosamente!');
+                    else {
                         alert('¡Capacitación creada exitosamente con ID: ' + res.id + '!');
                         document.getElementById('formCapacitacion').reset();
                         document.getElementById('catCap').value = "Capacitación";
-                        document.getElementById('valorPorcentual').value = "10.00% por cada acierto";
+                        precargarAreasUnicas([]);
                     }
                     if (usuarioPuedeModificar) cargarListaCapacitacionesParaModificar();
                 } else {
@@ -1409,10 +1484,9 @@
                         return;
                     }
 
-                    salida.innerHTML = `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i> Procesando y preparando preguntas...</div>`;
+                    salida.innerHTML = `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i> Procesando preguntas...</div>`;
 
                     let listaPreguntasLote = [];
-
                     for (let i = 0; i < jsonRows.length; i++) {
                         let row = jsonRows[i];
                         let cleanRow = {};
@@ -1425,20 +1499,13 @@
                         let respCorrecta = cleanRow['respuestacorrecta'] || cleanRow['respuesta_correcta'] || '';
                         let tipoPreg = cleanRow['tipo'] || 'Unica';
                         let cat = cleanRow['categoria'] || 'Capacitación';
-                        let dif = cleanRow['dificultad'] || 'Media';
                         let punt = cleanRow['puntaje'] || 5;
-
                         let opcionesRaw = cleanRow['opcionesjson'] || cleanRow['opciones_json'] || '';
                         let opcionesArr = [];
 
                         if (typeof opcionesRaw === 'string') {
-                            if (opcionesRaw.includes(';')) {
-                                opcionesArr = opcionesRaw.split(';').map(o => o.trim());
-                            } else if (opcionesRaw.startsWith('[')) {
-                                try { opcionesArr = JSON.parse(opcionesRaw); } catch(err) { opcionesArr = []; }
-                            } else {
-                                opcionesArr = opcionesRaw.split(',').map(o => o.trim());
-                            }
+                            if (opcionesRaw.includes(';')) opcionesArr = opcionesRaw.split(';').map(o => o.trim());
+                            else opcionesArr = opcionesRaw.split(',').map(o => o.trim());
                         } else if (Array.isArray(opcionesRaw)) {
                             opcionesArr = opcionesRaw;
                         }
@@ -1452,17 +1519,9 @@
                             respuestaCorrecta: respCorrecta.toString().trim(),
                             puntaje: parseInt(punt) || 5,
                             categoria: cat.toString().trim(),
-                            dificultad: dif.toString().trim()
+                            dificultad: 'Media'
                         });
                     }
-
-                    if (listaPreguntasLote.length === 0) {
-                        salida.innerHTML = `<div class="alert alert-warning">No se encontraron filas con preguntas válidas.</div>`;
-                        restaurarBtn(btn);
-                        return;
-                    }
-
-                    salida.innerHTML = `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i> Guardando ${listaPreguntasLote.length} preguntas en un solo paso...</div>`;
 
                     const res = await fetch(API_URL, {
                         method: 'POST',
@@ -1471,18 +1530,13 @@
                     const jsonRes = await res.json();
 
                     if(jsonRes.success) {
-                        salida.innerHTML = `
-                            <div class="alert alert-success">
-                                <h5><i class="fas fa-check-circle me-2"></i> ¡Carga Masiva Exitosa!</h5>
-                                <p class="mb-0">Se han guardado correctamente <strong>${jsonRes.guardadas} preguntas</strong> en la hoja <code>Banco_Preguntas</code> en tiempo récord.</p>
-                            </div>
-                        `;
+                        salida.innerHTML = `<div class="alert alert-success">¡Carga Masiva Exitosa! Se guardaron <strong>${jsonRes.guardadas} preguntas</strong>.</div>`;
                         document.getElementById('excelFile').value = '';
                     } else {
-                        salida.innerHTML = `<div class="alert alert-danger">Error al guardar el lote: ${jsonRes.error}</div>`;
+                        salida.innerHTML = `<div class="alert alert-danger">Error: ${jsonRes.error}</div>`;
                     }
                 } catch (error) {
-                    salida.innerHTML = `<div class="alert alert-danger">Error procesando el archivo: ${error.message}</div>`;
+                    salida.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
                 }
                 restaurarBtn(btn);
             };
@@ -1526,7 +1580,7 @@
 
         function cargarTablaReportes() {
             const tbody = document.getElementById('tbodyReportes');
-            tbody.innerHTML = `<tr><td colspan="7" class="py-4"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Cargando historial de evaluaciones...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="py-4"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Cargando historial...</td></tr>`;
 
             fetch(API_URL, {
                 method: 'POST',
@@ -1551,7 +1605,7 @@
             tbody.innerHTML = "";
 
             if (!lista || lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-muted py-4">No hay registros de evaluaciones presentadas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-muted py-4">No hay registros de evaluaciones.</td></tr>`;
                 return;
             }
 
@@ -1559,7 +1613,7 @@
                 let esAprobado = String(r.estado).toLowerCase().includes('aprobado');
                 let badge = esAprobado ? '<span class="badge bg-success">Aprobado</span>' : '<span class="badge bg-danger">Reprobado</span>';
 
-                let tr = `
+                tbody.innerHTML += `
                     <tr>
                         <td class="text-secondary" style="font-size: 11px;">${r.fecha}</td>
                         <td class="fw-bold">${r.identificacion}</td>
@@ -1570,7 +1624,6 @@
                         <td>${badge}</td>
                     </tr>
                 `;
-                tbody.innerHTML += tr;
             });
         }
 
@@ -1582,9 +1635,7 @@
                 let coincideTexto = r.nombreUsuario.toLowerCase().includes(busqueda) || 
                                      r.identificacion.toLowerCase().includes(busqueda) || 
                                      r.capacitacion.toLowerCase().includes(busqueda);
-                
                 let coincideEstado = estadoFiltro === "" || r.estado.toLowerCase().includes(estadoFiltro);
-
                 return coincideTexto && coincideEstado;
             });
 
@@ -1593,7 +1644,7 @@
 
         function exportarReporteExcel() {
             if (!datosReporteGlobal || datosReporteGlobal.length === 0) {
-                alert('No hay datos para exportar. Carga primero el reporte.');
+                alert('No hay datos para exportar.');
                 return;
             }
 
@@ -1612,7 +1663,7 @@
             const ws = XLSX.utils.json_to_sheet(datosParaExcel);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Reporte_Evaluaciones");
-            XLSX.writeFile(wb, `Reporte_Capacitaciones_GlobalLife_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.writeFile(wb, `Reporte_Capacitaciones_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
     </script>
 </body>
