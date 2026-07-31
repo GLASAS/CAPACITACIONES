@@ -176,7 +176,12 @@
                             <i class="fas fa-tasks me-2"></i> Gestión de Capacitaciones
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation" id="liTabReportes">
+                    <li class="nav-item d-none" role="presentation" id="liTabUsuarios">
+                        <button class="nav-link rounded-3 fw-bold px-4 py-2.5" id="pills-usuarios-tab" data-bs-toggle="pill" data-bs-target="#pills-usuarios" type="button" role="tab" onclick="cargarTablaUsuarios()">
+                            <i class="fas fa-users-cog me-2"></i> Gestión de Usuarios
+                        </button>
+                    </li>
+                    <li class="nav-item d-none" role="presentation" id="liTabReportes">
                         <button class="nav-link rounded-3 fw-bold px-4 py-2.5" id="pills-reportes-tab" data-bs-toggle="pill" data-bs-target="#pills-reportes" type="button" role="tab" onclick="cargarTablaReportes()">
                             <i class="fas fa-chart-bar me-2"></i> Reportes e Historial
                         </button>
@@ -347,7 +352,108 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑA 2: DASHBOARD DE REPORTES E HISTORIAL (DEDICADA Y CON PERMISO EXCLUSIVO) -->
+                    <!-- PESTAÑA 2: GESTIÓN DE USUARIOS (NUEVO MÓDULO EXCLUSIVO) -->
+                    <div class="tab-pane fade" id="pills-usuarios" role="tabpanel">
+                        <div class="card shadow border-0 rounded-4 p-4 p-md-5 mb-4 bg-white">
+                            <h5 class="fw-bold mb-4" style="color: var(--gl-blue-primary); font-size: 16px;">
+                                <i class="fas fa-user-plus me-2"></i> Registrar Nuevo Usuario / Funcionario
+                            </h5>
+
+                            <form id="formCrearUsuario">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Identificación (Cédula)</label>
+                                        <input type="text" class="form-control" id="uIdentificacion" required placeholder="Ej: 80092734">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Fecha de Expedición (Contraseña)</label>
+                                        <input type="date" class="form-control" id="uFechaExpedicion" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Nombre Completo</label>
+                                        <input type="text" class="form-control" id="uNombre" required placeholder="NOMBRES Y APELLIDOS">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Cargo</label>
+                                        <input type="text" class="form-control" id="uCargo" required placeholder="Ej: LIDER TALENTO HUMANO">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Área</label>
+                                        <input type="text" class="form-control" id="uArea" required placeholder="Ej: TALENTO HUMANO">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary">Estado</label>
+                                        <select class="form-select" id="uEstado">
+                                            <option value="ACTIVO" selected>ACTIVO</option>
+                                            <option value="INACTIVO">INACTIVO</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">¿Es Administrador? (ADMIN)</label>
+                                        <select class="form-select" id="uAdmin">
+                                            <option value="" selected>NO (Funcionario Estándar)</option>
+                                            <option value="SI">SI (Administrador)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-secondary">¿Puede Modificar? (MODIFICACION)</label>
+                                        <select class="form-select" id="uModificacion">
+                                            <option value="" selected>NO</option>
+                                            <option value="SI">SI (Permiso completo)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" id="btnGuardarUsuario" class="btn btn-primary py-3 rounded-3 fw-bold shadow-sm">
+                                        <i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario
+                                    </button>
+                                </div>
+                            </form>
+
+                            <hr class="my-5">
+
+                            <!-- TABLA DE USUARIOS REGISTRADOS -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold m-0" style="color: var(--gl-blue-primary); font-size: 16px;">
+                                    <i class="fas fa-users me-2"></i> Usuarios Registrados en el Sistema
+                                </h5>
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill fw-bold" onclick="cargarTablaUsuarios()">
+                                    <i class="fas fa-sync-alt me-1"></i> Actualizar
+                                </button>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="text" class="form-control form-control-sm" id="inputBuscarUsuario" placeholder="Buscar por cédula, nombre, cargo o área..." onkeyup="filtrarTablaUsuarios()">
+                            </div>
+
+                            <div class="table-responsive rounded-3 border bg-white" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-hover align-middle mb-0 text-center">
+                                    <thead class="table-light sticky-top" style="font-size: 13px;">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Identificación</th>
+                                            <th>Nombre</th>
+                                            <th>Cargo / Área</th>
+                                            <th>Fecha Exp.</th>
+                                            <th>Estado</th>
+                                            <th>Admin</th>
+                                            <th>Modif.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyUsuarios" style="font-size: 13px;">
+                                        <tr>
+                                            <td colspan="8" class="text-muted py-4">Haz clic en <b>Actualizar</b> para cargar el listado.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PESTAÑA 3: DASHBOARD DE REPORTES E HISTORIAL -->
                     <div class="tab-pane fade" id="pills-reportes" role="tabpanel">
                         <div class="card shadow border-0 rounded-4 p-4 p-md-5 mb-4 bg-white">
                             <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
@@ -508,7 +614,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby1dtqHB_nFpBYjmoV9oJ79fVPentnRhWnc3Hcu06RXTeTKgJFwDCQN2nFrZgFl7juH/exec";310720261405
+        const API_URL = "https://script.google.com/macros/s/AKfycbxtNO86pa112B4vGkB0G2poACKNG0GgnG7RHAX7LUn81e0kvIRiYRTwR6dN0zJzoTmZ/exec";//310720261410
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
@@ -520,6 +626,7 @@
         let tiempoRestante = 60;
         let cacheCapacitacionesUsuario = null;
         let datosReporteGlobal = [];
+        let datosUsuariosGlobal = [];
 
         document.getElementById('cantPregExamen').addEventListener('change', function() {
             let cant = parseInt(this.value) || 1;
@@ -551,16 +658,17 @@
                         usuarioPuedeModificar = res.puedeModificar;
                         
                         const seccionSelector = document.getElementById('seccionSelectorModificacion');
+                        const liUsuarios = document.getElementById('liTabUsuarios');
                         const liReportes = document.getElementById('liTabReportes');
 
                         if (usuarioPuedeModificar) {
-                            // SI ES ADMIN Y MODIFICACION = SI -> Puede modificar y VER EL DASHBOARD DE REPORTES
                             seccionSelector.classList.remove('d-none');
+                            liUsuarios.classList.remove('d-none');
                             liReportes.classList.remove('d-none');
                             cargarListaCapacitacionesParaModificar();
                         } else {
-                            // SI ES ADMIN PERO MODIFICACION = NO -> NO puede ver el Dashboard
                             seccionSelector.classList.add('d-none');
+                            liUsuarios.classList.add('d-none');
                             liReportes.classList.add('d-none');
                         }
 
@@ -580,6 +688,108 @@
             });
         });
 
+        // GESTIÓN DE CREACIÓN Y CONSULTA DE USUARIOS
+        document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const dataUsuario = {
+                identificacion: document.getElementById('uIdentificacion').value.trim(),
+                fechaExpedicion: document.getElementById('uFechaExpedicion').value,
+                nombre: document.getElementById('uNombre').value.trim(),
+                cargo: document.getElementById('uCargo').value.trim(),
+                area: document.getElementById('uArea').value.trim(),
+                estado: document.getElementById('uEstado').value,
+                admin: document.getElementById('uAdmin').value,
+                modificacion: document.getElementById('uModificacion').value
+            };
+
+            const btn = document.getElementById('btnGuardarUsuario');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Registrando usuario...';
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'crearUsuario', data: dataUsuario })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert('¡Usuario registrado exitosamente en la plataforma!');
+                    document.getElementById('formCrearUsuario').reset();
+                    cargarTablaUsuarios();
+                } else {
+                    alert('Error: ' + res.error);
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario';
+            })
+            .catch(err => {
+                alert('Error de red: ' + err);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario';
+            });
+        });
+
+        function cargarTablaUsuarios() {
+            const tbody = document.getElementById('tbodyUsuarios');
+            tbody.innerHTML = `<tr><td colspan="8" class="py-4"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Cargando usuarios...</td></tr>`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'obtenerUsuarios' })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    datosUsuariosGlobal = res.usuarios;
+                    renderizarTablaUsuarios(datosUsuariosGlobal);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-danger py-4">Error: ${res.error}</td></tr>`;
+                }
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-danger py-4">Error de red: ${err}</td></tr>`;
+            });
+        }
+
+        function renderizarTablaUsuarios(lista) {
+            const tbody = document.getElementById('tbodyUsuarios');
+            tbody.innerHTML = "";
+
+            if (!lista || lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-muted py-4">No hay usuarios registrados.</td></tr>`;
+                return;
+            }
+
+            lista.forEach(u => {
+                let badgeEstado = u.estado === 'ACTIVO' ? '<span class="badge bg-success">ACTIVO</span>' : '<span class="badge bg-secondary">INACTIVO</span>';
+                let tr = `
+                    <tr>
+                        <td>${u.idUsuario}</td>
+                        <td class="fw-bold">${u.identificacion}</td>
+                        <td class="text-start">${u.nombre}</td>
+                        <td class="text-start text-muted" style="font-size: 11px;">${u.cargo} / ${u.area}</td>
+                        <td>${u.fechaExpedicion}</td>
+                        <td>${badgeEstado}</td>
+                        <td class="fw-bold text-primary">${u.admin || 'NO'}</td>
+                        <td class="fw-bold text-primary">${u.modificacion || 'NO'}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += tr;
+            });
+        }
+
+        function filtrarTablaUsuarios() {
+            let busqueda = document.getElementById('inputBuscarUsuario').value.toLowerCase();
+            let filtrados = datosUsuariosGlobal.filter(u => {
+                return u.nombre.toLowerCase().includes(busqueda) || 
+                       u.identificacion.toLowerCase().includes(busqueda) || 
+                       u.cargo.toLowerCase().includes(busqueda) ||
+                       u.area.toLowerCase().includes(busqueda);
+            });
+            renderizarTablaUsuarios(filtrados);
+        }
+
         function cambiarVistaUsuario() {
             document.getElementById('cardPanelAdmin').classList.add('d-none');
             document.getElementById('cardPanelUsuario').classList.remove('d-none');
@@ -595,6 +805,7 @@
             cacheCapacitacionesUsuario = null;
             listaCapacitacionesGlobal = [];
             datosReporteGlobal = [];
+            datosUsuariosGlobal = [];
             document.getElementById('formLogin').reset();
             document.getElementById('resultadoLogin').innerHTML = "";
             document.getElementById('cardLogin').classList.remove('d-none');
