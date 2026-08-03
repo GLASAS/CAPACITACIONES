@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Life - Plataforma de Capacitaciones</title>
+    <title>Global Life Ambulancias SAS - Plataforma de Capacitaciones</title>
     <!-- Logo en la pestaña del navegador -->
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej">
     <!-- Bootstrap 5 -->
@@ -39,7 +39,7 @@
             margin-bottom: 20px;
         }
         .brand-logo {
-            max-height: 85px;
+            max-height: 120px;
             width: auto;
             object-fit: contain;
         }
@@ -104,11 +104,88 @@
 
     <div class="container py-4">
         
+        <!-- PANTALLA DE BIENVENIDA / SELECCIÓN QR -->
+        <div class="login-card d-none" id="cardBienvenidaQR" style="max-width: 500px;">
+            <div class="logo-container">
+                <div class="mb-1">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life Ambulancias SAS" class="brand-logo">
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <h4 class="fw-bold text-dark" style="color: var(--gl-blue-secondary) !important; font-size: 20px;">
+                    Portal Oficial Global Life Ambulancias SAS
+                </h4>
+                <p class="text-muted small mt-1">Seleccione una opción para continuar</p>
+            </div>
+
+            <div class="d-grid gap-3 my-4">
+                <button type="button" class="btn btn-outline-primary py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-3" onclick="irALoginFuncionario()">
+                    <i class="fas fa-user-tie fs-4"></i>
+                    <div class="text-start">
+                        <div class="fs-6">Soy Funcionario</div>
+                        <div style="font-size: 11px; font-weight: normal; opacity: 0.8;">Iniciar sesión en la plataforma</div>
+                    </div>
+                </button>
+
+                <button type="button" class="btn btn-success py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-3" onclick="irAValidarCertificadoDirecto()">
+                    <i class="fas fa-certificate fs-4"></i>
+                    <div class="text-start">
+                        <div class="fs-6">Validar Certificado</div>
+                        <div style="font-size: 11px; font-weight: normal; opacity: 0.8;">Verificar autenticidad mediante código QR</div>
+                    </div>
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-3" onclick="irAConsultaPublicaCertificados()">
+                    <i class="fas fa-search fs-4"></i>
+                    <div class="text-start">
+                        <div class="fs-6">Consulta de Certificaciones</div>
+                        <div style="font-size: 11px; font-weight: normal; opacity: 0.8;">Consultar cursos y certificados por cédula</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- MÓDULO PÚBLICO DE CONSULTA DE CERTIFICACIONES -->
+        <div class="login-card d-none" id="cardConsultaCertificaciones">
+            <div class="logo-container">
+                <div class="mb-1">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life Ambulancias SAS" class="brand-logo">
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <span class="fw-bold text-dark" style="font-size: 18px; color: var(--gl-blue-secondary) !important;">
+                    <i class="fas fa-search me-2" style="color: var(--gl-blue-primary);"></i> Consulta de Certificaciones
+                </span>
+                <p class="text-muted small mt-2">Consulte los cursos, certificados y capacitaciones asociados a su documento de identidad.</p>
+            </div>
+
+            <form id="formConsultaPublica">
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold small"><i class="fas fa-id-card me-1"></i> Número de identificación (Cédula)</label>
+                    <input type="text" class="form-control bg-light" id="inputIdentificacionConsulta" placeholder="Ingrese su número de cédula" required>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-ingresar shadow-sm">
+                        <i class="fas fa-search me-2"></i> 🔍 Consultar
+                    </button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-link text-decoration-none small text-muted p-0" onclick="regresarDesdeConsultaPublica()">
+                        <i class="fas fa-arrow-left me-1"></i> Volver al inicio
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <!-- PANTALLA DE INICIO DE SESIÓN -->
         <div class="login-card" id="cardLogin">
             <div class="logo-container">
                 <div class="mb-1">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life" class="brand-logo">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life Ambulancias SAS" class="brand-logo">
                 </div>
             </div>
 
@@ -159,7 +236,7 @@
                 <div class="card shadow border-0 rounded-4 overflow-hidden mb-4">
                     <div class="card-header text-white p-4 d-flex justify-content-between align-items-center" style="background-color: var(--gl-blue-secondary);">
                         <div>
-                            <h3 class="mb-0 fs-5"><i class="fas fa-shield-alt me-2"></i> Portal Administrativo - Global Life</h3>
+                            <h3 class="mb-0 fs-5"><i class="fas fa-shield-alt me-2"></i> Portal Administrativo - Global Life Ambulancias SAS</h3>
                             <p class="mb-0 text-white-50 small mt-1">Bienvenido(a), <span id="nombreAdminLogueado" class="fw-bold text-white"></span></p>
                         </div>
                         <div class="d-flex gap-2">
@@ -234,13 +311,13 @@
                                         <textarea class="form-control" id="descCap" rows="2" required></textarea>
                                     </div>
 
-                                    <!-- SECCIÓN DE SELECCIÓN MÚLTIPLE DE ÁREAS -->
+                                    <!-- SECCIÓN DE SELECCIÓN JERÁRQUICA: ÁREAS Y CARGOS -->
                                     <div class="col-12">
-                                        <label class="form-label small fw-bold text-primary"><i class="fas fa-users me-1"></i> Dirigido a las Áreas (Selección Múltiple)</label>
-                                        <div class="p-3 border rounded-3 bg-light" id="contenedorCheckboxesAreas" style="max-height: 160px; overflow-y: auto;">
-                                            <span class="text-muted small">Cargando áreas disponibles...</span>
+                                        <label class="form-label small fw-bold text-primary"><i class="fas fa-users me-1"></i> Dirigido a las Áreas y Cargos (Selección Jerárquica)</label>
+                                        <div class="p-3 border rounded-3 bg-light" id="contenedorJerarquiaAreasCargos" style="max-height: 250px; overflow-y: auto;">
+                                            <span class="text-muted small">Cargando áreas y cargos disponibles...</span>
                                         </div>
-                                        <div class="form-text text-muted" style="font-size: 11px;">Si no seleccionas ninguna área, la capacitación no estará disponible para ningún colaborador.</div>
+                                        <div class="form-text text-muted" style="font-size: 11px;">Selecciona las áreas completas o despliega para elegir cargos específicos. Si no seleccionas ninguno, no estará disponible.</div>
                                     </div>
 
                                     <div class="col-md-3">
@@ -569,10 +646,96 @@
                     </div>
                 </div>
 
-                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-book-reader me-2 text-primary"></i> Mis Capacitaciones Asignadas</h5>
-                
-                <div class="row g-4" id="contenedorListaCapacitacionesUsuario">
-                    <!-- Se llena dinámicamente -->
+                <!-- SECCIÓN 1: CAPACITACIONES PENDIENTES / POR CURSAR -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center my-3">
+                        <hr class="flex-grow-1 border-secondary opacity-25">
+                        <span class="px-3 fw-bold text-secondary text-uppercase" style="font-size: 13px; letter-spacing: 1px;">
+                            <i class="fas fa-clock me-1 text-primary"></i> Capacitaciones Pendientes / Por Cursar
+                        </span>
+                        <hr class="flex-grow-1 border-secondary opacity-25">
+                    </div>
+                    <div class="row g-4" id="contenedorCapacitacionesPendientes">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: CAPACITACIONES CULMINADAS / APROBADAS -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center my-4">
+                        <hr class="flex-grow-1 border-secondary opacity-25">
+                        <span class="px-3 fw-bold text-success text-uppercase" style="font-size: 13px; letter-spacing: 1px;">
+                            <i class="fas fa-check-circle me-1"></i> Capacitaciones Culminadas y Certificadas
+                        </span>
+                        <hr class="flex-grow-1 border-secondary opacity-25">
+                    </div>
+                    <div class="row g-4" id="contenedorCapacitacionesCulminadas">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VISTA DE VALIDACIÓN DE CERTIFICADO (MÓDULO INDEPENDIENTE) -->
+            <div class="col-lg-8 d-none" id="vistaValidacionCertificado">
+                <div class="card shadow border-0 rounded-4 p-5 bg-white text-center">
+                    <div class="mb-4">
+                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Global Life Ambulancias SAS" style="max-height: 90px;">
+                    </div>
+                    <h3 class="fw-bold text-primary mb-2">Verificación de Certificado</h3>
+                    <p class="text-muted mb-4">Sistema Oficial de Validación de Autenticidad - Global Life Ambulancias SAS</p>
+
+                    <div id="contenidoResultadoValidacion" class="p-4 rounded-4 bg-light border mb-4 text-start">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+
+                    <div>
+                        <button class="btn btn-outline-primary px-4 rounded-pill fw-bold" onclick="regresarDesdeValidacion()">
+                            <i class="fas fa-arrow-left me-2"></i> Volver a la Plataforma
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA DE RESULTADOS DE CONSULTA PÚBLICA DE CERTIFICACIONES -->
+            <div class="col-lg-10 d-none" id="vistaResultadoConsultaPublica">
+                <div class="card shadow border-0 rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h4 class="fw-bold text-primary mb-1"><i class="fas fa-award me-2"></i> Certificados y Cursos Registrados</h4>
+                            <p class="text-muted small mb-0">Consulta pública de historial de formación - Global Life Ambulancias SAS</p>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="regresarDesdeConsultaPublica()">
+                            <i class="fas fa-arrow-left me-1"></i> Nueva Consulta
+                        </button>
+                    </div>
+
+                    <div id="contenidoDatosFuncionarioConsulta" class="mb-4 p-4 rounded-4 bg-light border">
+                        <!-- Datos del funcionario -->
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fas fa-list-alt me-2 text-primary"></i> Listado de Cursos y Certificaciones</h5>
+                    
+                    <div class="table-responsive rounded-3 border bg-white" style="max-height: 480px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0 text-center">
+                            <thead class="table-light sticky-top" style="font-size: 13px;">
+                                <tr>
+                                    <th>Nombre del curso</th>
+                                    <th>Categoría</th>
+                                    <th>Fecha de realización</th>
+                                    <th>Fecha de expedición</th>
+                                    <th>Intensidad horaria</th>
+                                    <th>Estado</th>
+                                    <th>Número del certificado</th>
+                                    <th>Código único</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyTablaCursosConsulta" style="font-size: 13px;">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -630,44 +793,98 @@
 
     <!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
     <div style="display: none;">
-      <div id="certificadoPDF" style="width: 800px; padding: 40px; background: #ffffff; border: 10px solid #2956b1; font-family: 'Segoe UI', Arial, sans-serif; text-align: center; color: #1e293b; position: relative;">
-        <div style="margin-bottom: 25px;">
-          <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" style="max-height: 80px;" alt="Global Life Logo">
+      <div id="certificadoPDF" style="width: 1123px; height: 794px; padding: 35px 55px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 8px solid #1e3a8a; overflow: hidden;">
+        
+        <!-- MARCA DE AGUA INSTITUCIONAL EN LA ESQUINA INFERIOR DERECHA -->
+        <div style="position: absolute; right: -30px; bottom: -30px; width: 420px; height: 420px; opacity: 0.12; pointer-events: none; z-index: 0; transform: rotate(-10deg); display: flex; align-items: center; justify-content: center;">
+          <img src="https://lh3.googleusercontent.com/d/17JZ5EQHX9VgU_jgYNIf5dZQjPl5IHGJu" style="width: 100%; height: 100%; object-fit: contain;" alt="Marca de Agua Global Life">
         </div>
-        <h1 style="font-size: 32px; color: #2263fc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; font-weight: bold;">CERTIFICADO DE APROBACIÓN</h1>
-        <p style="font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Global Life IPS / Portal de Capacitación Continua</p>
-        <hr style="border: 0; height: 2px; background: #2263fc; margin: 25px auto; width: 80%;">
-        <p style="font-size: 16px; margin-top: 20px;">Hace constar que:</p>
-        <h2 id="certNombreUsuario" style="font-size: 28px; color: #0f172a; margin: 15px 0; font-weight: bold; text-transform: uppercase;">[NOMBRE DEL COLABORADOR]</h2>
-        <p style="font-size: 15px; color: #475569; margin-bottom: 25px;">Identificado(a) con C.C. N° <strong id="certIdentificacion">[CEDULA]</strong></p>
-        <p style="font-size: 16px; line-height: 1.6;">Ha completado y aprobado satisfactoriamente el módulo de capacitación en:</p>
-        <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin: 20px auto; width: 85%;">
-          <h3 id="certNombreCapacitacion" style="font-size: 22px; color: #2956b1; margin: 0; font-weight: bold;">[NOMBRE DE LA CAPACITACIÓN]</h3>
-        </div>
-        <p style="font-size: 14px; color: #475569; margin-top: 15px;">
-          Calificación obtenida: <strong id="certCalificacion" style="color: #16a34a;">100%</strong>
-        </p>
-        <div style="margin-top: 50px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 40px;">
-          <div style="text-align: center; width: 40%;">
-            <div style="border-bottom: 1px solid #94a3b8; margin-bottom: 5px;"></div>
-            <p style="font-size: 12px; font-weight: bold; margin: 0; color: #334155;">Gestión de Talento Humano</p>
-            <p style="font-size: 10px; color: #64748b; margin: 0;">Global Life IPS</p>
+
+        <!-- Marco decorativo interno elegante -->
+        <div style="position: absolute; top: 14px; left: 14px; right: 14px; bottom: 14px; border: 1.5px solid #94a3b8; pointer-events: none; z-index: 1;"></div>
+
+        <!-- Encabezado superior con Logotipo de la Empresa y texto a la derecha -->
+        <div style="display: flex; justify-content: space-between; align-items: center; z-index: 2; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-top: 4px;">
+          <div style="width: 38%; text-align: left;">
+            <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" style="max-height: 85px; width: auto;" alt="Global Life Ambulancias SAS Logo">
           </div>
-          <div style="text-align: center; width: 40%;">
-            <p style="font-size: 12px; color: #334155; margin-bottom: 5px;">Expedido el:</p>
-            <p id="certFechaExpedicion" style="font-size: 13px; font-weight: bold; color: #0f172a; margin: 0;">[FECHA]</p>
+          <div style="width: 24%; text-align: center;"></div>
+          <div style="width: 38%; text-align: right;">
+            <p style="font-size: 13px; color: #1e3a8a; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-weight: bold;">GLOBAL LIFE AMBULANCIAS SAS</p>
+            <p style="font-size: 11px; color: #64748b; margin: 3px 0 0 0;">Formación y Talento Humano</p>
           </div>
         </div>
-        <div style="margin-top: 30px; font-size: 10px; color: #94a3b8;">
-          Documento generado automáticamente por la Plataforma de Capacitaciones Global Life.
+
+        <!-- Cuerpo Central del Certificado -->
+        <div style="text-align: center; z-index: 2; margin: 2px 0 0 0;">
+          
+          <!-- Escudo de Colombia -->
+          <div style="text-align: center; margin-bottom: 8px;">
+            <img src="https://lh3.googleusercontent.com/d/11tQ-sTQC5Tklpz8lyHY0GG5x_C2M38TA" style="max-height: 130px; width: auto; image-rendering: -webkit-optimize-contrast;" alt="Escudo de Colombia">
+          </div>
+
+          <!-- Título principal -->
+          <h1 style="font-size: 32px; color: #1e3a8a; text-transform: uppercase; letter-spacing: 3.5px; margin: 0 0 6px 0; font-weight: 800;">CERTIFICADO DE APROBACIÓN</h1>
+          <p style="font-size: 14px; color: #64748b; margin: 0 0 12px 0; letter-spacing: 1px; font-weight: 600;">LA DIRECCIÓN DE TALENTO HUMANO HACE CONSTAR QUE:</p>
+          
+          <!-- Nombre del participante -->
+          <h2 id="certNombreUsuario" style="font-size: 36px; color: #0f172a; margin: 0 0 8px 0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">[NOMBRE DEL COLABORADOR]</h2>
+          
+          <p style="font-size: 15px; color: #475569; margin: 0 0 12px 0;">Identificado(a) con Cédula de Ciudadanía N° <strong id="certIdentificacion" style="color: #0f172a; font-size: 16px;">[CEDULA]</strong></p>
+          
+          <p style="font-size: 14px; color: #334155; margin: 0 0 10px 0; line-height: 1.4;">Completó y aprobó satisfactoriamente los requisitos del programa de capacitación en:</p>
+          
+          <!-- Nombre del curso -->
+          <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 12px 20px; border-radius: 8px; margin: 0 auto 12px auto; width: 88%; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <h3 id="certNombreCapacitacion" style="font-size: 22px; color: #1e3a8a; margin: 0; font-weight: bold;">[NOMBRE DE LA CAPACITACIÓN]</h3>
+          </div>
+
+          <!-- Información de Expedición -->
+          <div style="font-size: 13px; color: #334155; line-height: 1.5;">
+            CERTIFICADO No. <strong id="certNumeroUnico" style="color: #0f172a; font-size: 14px;">[NUMERO]</strong><br>
+            Fecha de expedición: <strong id="certFechaExpedicion" style="color: #0f172a; font-size: 14px;">[FECHA]</strong>
+          </div>
         </div>
+
+        <!-- Bloque Inferior con Firma y el Código QR exacto de tu enlace actualizado -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; padding: 0 20px; margin-top: 4px;">
+          
+          <!-- Nota aclaratoria -->
+          <div style="width: 30%; text-align: left;">
+            <p style="font-size: 10px; color: #64748b; margin: 0; line-height: 1.4;">Escanee el código QR para verificar la autenticidad de este documento en el portal corporativo oficial de Global Life Ambulancias SAS.</p>
+          </div>
+
+          <!-- IMAGEN DE QR CORREGIDA CON EL ENLACE DIRECTO DE GOOGLE DRIVE DE TU IMAGEN -->
+          <div style="text-align: center; width: 22%; display: flex; flex-direction: column; align-items: center;">
+            <div style="position: relative; padding: 4px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; display: inline-block; width: 84px; height: 84px; box-sizing: border-box;">
+              <img src="https://lh3.googleusercontent.com/d/1rQwY8VD-q686oCfkxy1vUzOOhgXLzmZQ=s220" style="width: 100%; height: 100%; object-fit: contain;" alt="Código QR Fijo">
+            </div>
+            <span style="font-size: 9px; color: #64748b; margin-top: 4px; font-weight: bold;">Código de Validación QR</span>
+          </div>
+
+          <!-- Firma del Líder de Talento Humano -->
+          <div style="text-align: center; width: 30%;">
+            <div style="border-bottom: 1.5px solid #475569; margin-bottom: 4px; height: 26px;"></div>
+            <p style="font-size: 12px; font-weight: bold; margin: 0; color: #0f172a;">Líder de Talento Humano</p>
+            <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">Global Life Ambulancias SAS</p>
+          </div>
+
+        </div>
+
+        <!-- Pie de página institucional -->
+        <div style="text-align: center; z-index: 2; border-top: 1px solid #e2e8f0; padding-top: 6px;">
+          <p style="font-size: 9px; color: #94a3b8; margin: 0; letter-spacing: 0.5px;">
+            Documento generado automáticamente por la Plataforma de Capacitaciones Global Life Ambulancias SAS. Validez oficial garantizada mediante código QR.
+          </p>
+        </div>
+
       </div>
     </div>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzLgsbpQH8r56vLF-dtx8DrgZBGPCxeqIdHc66WJ1eFpOqJzp8UraK8QOZ7XKQbe7FO/exec";//310720261910
+        const API_URL = "https://script.google.com/macros/s/AKfycbzLgsbpQH8r56vLF-dtx8DrgZBGPCxeqIdHc66WJ1eFpOqJzp8UraK8QOZ7XKQbe7FO/exec";
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
@@ -680,7 +897,200 @@
         let cacheCapacitacionesUsuario = null;
         let datosReporteGlobal = [];
         let datosUsuariosGlobal = [];
-        let areasUnicasGlobal = [];
+        let jerarquiaAreaCargosGlobal = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const validarCertId = urlParams.get('validar_certificado');
+            const consultarIdentificacion = urlParams.get('consultar_certificaciones');
+            const actionQR = urlParams.get('action');
+
+            if (validarCertId) {
+                document.getElementById('cardLogin').classList.add('d-none');
+                document.getElementById('cardBienvenidaQR').classList.add('d-none');
+                document.getElementById('cardConsultaCertificaciones').classList.add('d-none');
+                document.getElementById('cardPanelUsuario').classList.remove('d-none');
+                document.getElementById('vistaListaCapacitaciones').classList.add('d-none');
+                document.getElementById('vistaValidacionCertificado').classList.remove('d-none');
+                ejecutarValidacionPublicaCertificado(validarCertId);
+            } else if (consultarIdentificacion) {
+                document.getElementById('cardLogin').classList.add('d-none');
+                document.getElementById('cardBienvenidaQR').classList.add('d-none');
+                document.getElementById('cardConsultaCertificaciones').classList.add('d-none');
+                document.getElementById('cardPanelUsuario').classList.remove('d-none');
+                document.getElementById('vistaListaCapacitaciones').classList.add('d-none');
+                document.getElementById('vistaResultadoConsultaPublica').classList.remove('d-none');
+                ejecutarConsultaPublicaCertificaciones(consultarIdentificacion);
+            } else if (actionQR === 'verificar') {
+                document.getElementById('cardLogin').classList.add('d-none');
+                document.getElementById('cardConsultaCertificaciones').classList.add('d-none');
+                document.getElementById('cardBienvenidaQR').classList.remove('d-none');
+            } else if (actionQR === 'consultar') {
+                document.getElementById('cardLogin').classList.add('d-none');
+                document.getElementById('cardBienvenidaQR').classList.add('d-none');
+                document.getElementById('cardConsultaCertificaciones').classList.remove('d-none');
+            }
+        });
+
+        function irALoginFuncionario() {
+            document.getElementById('cardBienvenidaQR').classList.add('d-none');
+            document.getElementById('cardConsultaCertificaciones').classList.add('d-none');
+            document.getElementById('cardLogin').classList.remove('d-none');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function irAValidarCertificadoDirecto() {
+            let numeroIngresado = prompt("Por favor, ingrese el número de certificado o código de validación QR:");
+            if (numeroIngresado && numeroIngresado.trim() !== "") {
+                window.location.href = `${window.location.pathname}?validar_certificado=${encodeURIComponent(numeroIngresado.trim())}`;
+            }
+        }
+
+        function irAConsultaPublicaCertificaciones() {
+            document.getElementById('cardBienvenidaQR').classList.add('d-none');
+            document.getElementById('cardLogin').classList.add('d-none');
+            document.getElementById('cardConsultaCertificaciones').classList.remove('d-none');
+            window.history.replaceState({}, document.title, `${window.location.pathname}?action=consultar`);
+        }
+
+        function regresarDesdeConsultaPublica() {
+            document.getElementById('cardConsultaCertificaciones').classList.add('d-none');
+            document.getElementById('cardPanelUsuario').classList.add('d-none');
+            document.getElementById('vistaResultadoConsultaPublica').classList.add('d-none');
+            document.getElementById('cardBienvenidaQR').classList.remove('d-none');
+            window.history.replaceState({}, document.title, `${window.location.pathname}?action=verificar`);
+        }
+
+        document.getElementById('formConsultaPublica').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const identificacion = document.getElementById('inputIdentificacionConsulta').value.trim();
+            if (!identificacion) return;
+
+            window.location.href = `${window.location.pathname}?consultar_certificaciones=${encodeURIComponent(identificacion)}`;
+        });
+
+        function ejecutarConsultaPublicaCertificaciones(identificacion) {
+            const contenedorDatos = document.getElementById('contenidoDatosFuncionarioConsulta');
+            const tbodyCursos = document.getElementById('tbodyTablaCursosConsulta');
+
+            contenedorDatos.innerHTML = `<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Consultando registros...</p></div>`;
+            tbodyCursos.innerHTML = "";
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'consultarCertificacionesPublicas',
+                    identificacion: identificacion
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.existe) {
+                    const f = res.funcionario;
+                    contenedorDatos.innerHTML = `
+                        <div class="row g-2" style="font-size: 14px;">
+                            <div class="col-md-6"><b>Nombre completo:</b> ${f.nombre}</div>
+                            <div class="col-md-6"><b>Número de identificación:</b> ${f.identificacion}</div>
+                            <div class="col-md-6"><b>Empresa:</b> Global Life Ambulancias SAS</div>
+                            <div class="col-md-6"><b>Cargo:</b> ${f.cargo || 'No especificado'}</div>
+                            <div class="col-md-6"><b>Estado del funcionario:</b> <span class="badge bg-success">${f.estado || 'ACTIVO'}</span></div>
+                            <div class="col-md-6"><b>Fecha de la última actualización:</b> ${f.fechaActualizacion || new Date().toLocaleDateString()}</div>
+                        </div>
+                    `;
+
+                    if (!res.cursos || res.cursos.length === 0) {
+                        tbodyCursos.innerHTML = `<tr><td colspan="9" class="text-muted py-4">No se encontraron cursos o certificados asociados a este número de identificación.</td></tr>`;
+                        return;
+                    }
+
+                    res.cursos.forEach(c => {
+                        let badgeEstado = c.aprobado ? '<span class="badge bg-success">Aprobado / Vigente</span>' : '<span class="badge bg-secondary">Cursando</span>';
+                        let numeroCert = c.numeroCertificado || `GL-${f.identificacion}-${c.idCapacitacion}`;
+                        let codigoUnico = c.codigoUnico || `COD-${c.idCapacitacion}`;
+
+                        let accionesHtml = c.aprobado ? `
+                            <div class="d-flex justify-content-center gap-1">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill px-2" title="Ver certificado" onclick="descargarCertificadoDesdeConsultaPublica('${f.identificacion}', '${c.idCapacitacion}')">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-success btn-sm rounded-pill px-2" title="Descargar certificado (PDF)" onclick="descargarCertificadoDesdeConsultaPublica('${f.identificacion}', '${c.idCapacitacion}')">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm rounded-pill px-2" title="Validar autenticidad" onclick="window.location.href='${window.location.pathname}?validar_certificado=${encodeURIComponent(numeroCert)}'">
+                                    <i class="fas fa-certificate"></i>
+                                </button>
+                            </div>
+                        ` : `<span class="text-muted small">N/A</span>`;
+
+                        tbodyCursos.innerHTML += `
+                            <tr>
+                                <td class="text-start fw-bold">${c.nombreCurso}</td>
+                                <td><span class="badge bg-light text-dark border">${c.categoria || 'Capacitación'}</span></td>
+                                <td>${c.fecha || 'N/A'}</td>
+                                <td>${c.fecha || 'N/A'}</td>
+                                <td>${c.duracion || '1'} horas</td>
+                                <td>${badgeEstado}</td>
+                                <td class="fw-semibold text-primary">${numeroCert}</td>
+                                <td class="text-muted small font-monospace">${codigoUnico}</td>
+                                <td>${accionesHtml}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    contenedorDatos.innerHTML = `
+                        <div class="alert alert-warning text-center m-0 py-3 fw-bold">
+                            <i class="fas fa-info-circle me-2"></i> No se encontraron cursos o certificados asociados a este número de identificación.
+                        </div>
+                    `;
+                    tbodyCursos.innerHTML = `<tr><td colspan="9" class="text-muted py-4">Sin registros para mostrar.</td></tr>`;
+                }
+            })
+            .catch(err => {
+                contenedorDatos.innerHTML = `<div class="alert alert-danger text-center">Error de red al consultar el documento.</div>`;
+            });
+        }
+
+        function descargarCertificadoDesdeConsultaPublica(identificacion, idCapacitacion) {
+            alert('Generando Certificado PDF...');
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'obtenerDatosCertificado',
+                    identificacionUsuario: identificacion,
+                    idCapacitacion: idCapacitacion
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    const d = res.data;
+                    document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
+                    document.getElementById('certIdentificacion').textContent = d.identificacion;
+                    document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
+                    document.getElementById('certFechaExpedicion').textContent = d.fecha;
+                    document.getElementById('certNumeroUnico').textContent = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
+
+                    setTimeout(() => {
+                        const elementoPDF = document.getElementById('certificadoPDF');
+                        const opciones = {
+                            margin: 0,
+                            filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2, useCORS: true },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                        };
+
+                        html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+                            alert('¡El certificado ha sido descargado exitosamente!');
+                        });
+                    }, 500);
+                } else {
+                    alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
+                }
+            })
+            .catch(err => alert('Error de red al generar PDF: ' + err));
+        }
 
         document.getElementById('cantPregExamen').addEventListener('change', function() {
             let cant = parseInt(this.value) || 1;
@@ -757,26 +1167,26 @@
             });
         });
 
-        function precargarDatosAdmin(areasSeleccionadas = []) {
-            precargarAreasUnicas(areasSeleccionadas);
+        function precargarDatosAdmin(asignacionesGuardadas = []) {
+            precargarJerarquiaAreaCargos(asignacionesGuardadas);
             cargarListaCapacitacionesParaModificar();
         }
 
-        function precargarAreasUnicas(areasSeleccionadas = []) {
-            const contenedor = document.getElementById('contenedorCheckboxesAreas');
-            contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando áreas...</span>`;
+        function precargarJerarquiaAreaCargos(asignacionesGuardadas = []) {
+            const contenedor = document.getElementById('contenedorJerarquiaAreasCargos');
+            contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando áreas y cargos...</span>`;
 
             fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'obtenerAreasUnicas' })
+                body: JSON.stringify({ action: 'obtenerJerarquiaAreaCargos' })
             })
             .then(res => res.json())
             .then(res => {
                 if(res.success) {
-                    areasUnicasGlobal = res.areas;
-                    renderizarCheckboxesAreas(areasSeleccionadas);
+                    jerarquiaAreaCargosGlobal = res.jerarquia; // Estructura esperada del backend: { "ADMINISTRATIVA": ["AUXILIAR", "PSICOLOGO", "SST"], "OPERATIVO": ["CONDUCTOR", "AUXILIAR DE ENFERMERIA", "MEDICOS"] }
+                    renderizarJerarquiaAreasCargos(asignacionesGuardadas);
                 } else {
-                    contenedor.innerHTML = `<span class="text-danger small">Error al cargar áreas.</span>`;
+                    contenedor.innerHTML = `<span class="text-danger small">Error al cargar la estructura de áreas y cargos.</span>`;
                 }
             })
             .catch(err => {
@@ -784,29 +1194,77 @@
             });
         }
 
-        function renderizarCheckboxesAreas(seleccionadas = []) {
-            const contenedor = document.getElementById('contenedorCheckboxesAreas');
+        function renderizarJerarquiaAreasCargos(asignacionesGuardadas = []) {
+            const contenedor = document.getElementById('contenedorJerarquiaAreasCargos');
             contenedor.innerHTML = "";
 
-            if (!areasUnicasGlobal || areasUnicasGlobal.length === 0) {
-                contenedor.innerHTML = `<span class="text-muted small">No hay áreas registradas en el sistema.</span>`;
+            if (!jerarquiaAreaCargosGlobal || Object.keys(jerarquiaAreaCargosGlobal).length === 0) {
+                contenedor.innerHTML = `<span class="text-muted small">No hay áreas o cargos registrados en el sistema.</span>`;
                 return;
             }
 
-            let seleccionadasSet = new Set(seleccionadas.map(a => String(a).trim().toUpperCase()));
+            // Mapear asignaciones guardadas para fácil consulta (ej: "ADMINISTRATIVA" o "OPERATIVO:CONDUCTOR")
+            let guardadasSet = new Set(asignacionesGuardadas.map(a => String(a).trim().toUpperCase()));
 
-            areasUnicasGlobal.forEach((area, idx) => {
-                let estaChecked = seleccionadasSet.has(String(area).trim().toUpperCase()) ? 'checked' : '';
-                let htmlCheckbox = `
-                    <div class="form-check mb-1">
-                        <input class="form-check-input check-area-cap" type="checkbox" value="${area}" id="check_area_${idx}" ${estaChecked}>
-                        <label class="form-check-label text-dark small fw-semibold" for="check_area_${idx}">
-                            ${area}
-                        </label>
+            let areaIndex = 0;
+            for (let area in jerarquiaAreaCargosGlobal) {
+                let cargos = jerarquiaAreaCargosGlobal[area] || [];
+                let areaId = `chk_area_${areaIndex}`;
+                let areaChecked = guardadasSet.has(area.trim().toUpperCase()) ? 'checked' : '';
+
+                let htmlCargos = '';
+                cargos.forEach((cargo, cargoIdx) => {
+                    let cargoKey = `${area}:${cargo}`.toUpperCase();
+                    let cargoChecked = guardadasSet.has(cargoKey) || areaChecked ? 'checked' : '';
+                    htmlCargos += `
+                        <div class="form-check ms-4 mb-1">
+                            <input class="form-check-input check-cargo-item" type="checkbox" value="${area}:${cargo}" id="cargo_${areaIndex}_${cargoIdx}" data-area="${area}" ${cargoChecked} onchange="actualizarEstadoArea('${areaId}', 'cargos_${areaIndex}')">
+                            <label class="form-check-label text-secondary small" for="cargo_${areaIndex}_${cargoIdx}">
+                                ${cargo}
+                            </label>
+                        </div>
+                    `;
+                });
+
+                let htmlArea = `
+                    <div class="mb-2 border-bottom pb-2">
+                        <div class="form-check fw-bold">
+                            <input class="form-check-input check-area-parent" type="checkbox" value="${area}" id="${areaId}" ${areaChecked} onchange="toggleSeleccionArea(this, 'cargos_${areaIndex}')">
+                            <label class="form-check-label text-primary" for="${areaId}">
+                                <i class="fas fa-layer-group me-1"></i> Área: ${area}
+                            </label>
+                        </div>
+                        <div id="cargos_${areaIndex}" class="mt-1">
+                            ${htmlCargos}
+                        </div>
                     </div>
                 `;
-                contenedor.innerHTML += htmlCheckbox;
+                contenedor.innerHTML += htmlArea;
+                areaIndex++;
+            }
+        }
+
+        function toggleSeleccionArea(masterCheckbox, containerId) {
+            let contenedorCargos = document.getElementById(containerId);
+            if (!contenedorCargos) return;
+            let checkboxesCargos = contenedorCargos.querySelectorAll('.check-cargo-item');
+            checkboxesCargos.forEach(cb => {
+                cb.checked = masterCheckbox.checked;
             });
+        }
+
+        function actualizarEstadoArea(areaCheckboxId, containerId) {
+            let areaCheckbox = document.getElementById(areaCheckboxId);
+            let contenedorCargos = document.getElementById(containerId);
+            if (!areaCheckbox || !contenedorCargos) return;
+
+            let checkboxesCargos = contenedorCargos.querySelectorAll('.check-cargo-item');
+            let todosMarcados = true;
+            checkboxesCargos.forEach(cb => {
+                if (!cb.checked) todosMarcados = false;
+            });
+
+            areaCheckbox.checked = todosMarcados;
         }
 
         document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
@@ -837,7 +1295,7 @@
                     alert('¡Usuario registrado exitosamente en la plataforma!');
                     document.getElementById('formCrearUsuario').reset();
                     cargarTablaUsuarios();
-                    precargarAreasUnicas();
+                    precargarJerarquiaAreaCargos();
                 } else {
                     alert('Error: ' + res.error);
                 }
@@ -935,13 +1393,19 @@
         }
 
         function renderizarCapacitacionesUsuario(capacitaciones) {
-            const contenedor = document.getElementById('contenedorListaCapacitacionesUsuario');
-            contenedor.innerHTML = "";
+            const contenedorPendientes = document.getElementById('contenedorCapacitacionesPendientes');
+            const contenedorCulminadas = document.getElementById('contenedorCapacitacionesCulminadas');
+            
+            contenedorPendientes.innerHTML = "";
+            contenedorCulminadas.innerHTML = "";
 
             if(!capacitaciones || capacitaciones.length === 0) {
-                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones asignadas y disponibles para tu área en este momento.</div></div>`;
+                contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones asignadas y disponibles para tu área y cargo en este momento.</div></div>`;
                 return;
             }
+
+            let contadorPendientes = 0;
+            let contadorCulminadas = 0;
 
             capacitaciones.forEach(cap => {
                 let sinIntentos = (cap.intentosPermitidos > 0 && cap.intentosRealizados >= cap.intentosPermitidos);
@@ -951,6 +1415,7 @@
                 let botonExamenOAccion = "";
 
                 if (cap.yaAprobo) {
+                    contadorCulminadas++;
                     bannerAprobado = `
                         <div class="alert alert-success py-2 px-3 mb-3 rounded-3 d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-check-circle me-2"></i> <b>CAPACITACIÓN CULMINADA</b></span>
@@ -974,6 +1439,7 @@
                         `;
                     }
                 } else {
+                    contadorPendientes++;
                     botonExamenOAccion = `
                         <button id="btnExamen_${cap.id}" class="btn ${sinIntentos ? 'btn-secondary' : 'btn-success'} rounded-pill fw-bold w-100" onclick="iniciarExamen('${cap.id}')">
                             <i class="fas fa-file-alt me-2"></i> ${sinIntentos ? 'Intentos Agotados' : 'Presentar Examen'}
@@ -1034,8 +1500,20 @@
                         </div>
                     </div>
                 `;
-                contenedor.innerHTML += cardHtml;
+
+                if (cap.yaAprobo) {
+                    contenedorCulminadas.innerHTML += cardHtml;
+                } else {
+                    contenedorPendientes.innerHTML += cardHtml;
+                }
             });
+
+            if (contadorPendientes === 0) {
+                contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-light border text-center text-muted py-3 small">No tienes capacitaciones pendientes por cursar en este momento.</div></div>`;
+            }
+            if (contadorCulminadas === 0) {
+                contenedorCulminadas.innerHTML = `<div class="col-12"><div class="alert alert-light border text-center text-muted py-3 small">Aún no tienes capacitaciones culminadas o aprobadas.</div></div>`;
+            }
         }
 
         function abrirVisorPDF(urlPdf) {
@@ -1069,8 +1547,8 @@
                 return;
             }
 
-            const contenedor = document.getElementById('contenedorListaCapacitacionesUsuario');
-            contenedor.innerHTML = `<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Cargando capacitaciones...</p></div>`;
+            const contenedorPendientes = document.getElementById('contenedorCapacitacionesPendientes');
+            contenedorPendientes.innerHTML = `<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Cargando capacitaciones...</p></div>`;
 
             fetch(API_URL, {
                 method: 'POST',
@@ -1082,11 +1560,11 @@
                     cacheCapacitacionesUsuario = res.capacitaciones;
                     renderizarCapacitacionesUsuario(cacheCapacitacionesUsuario);
                 } else {
-                    contenedor.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">No se pudieron obtener las capacitaciones.</div></div>`;
+                    contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">No se pudieron obtener las capacitaciones.</div></div>`;
                 }
             })
             .catch(err => {
-                contenedor.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">Error de conexión: ${err}</div></div>`;
+                contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">Error de conexión: ${err}</div></div>`;
             });
         }
 
@@ -1302,7 +1780,16 @@
             if (temporizadorInterval) clearInterval(temporizadorInterval);
             document.getElementById('vistaExamenInteractivo').classList.add('d-none');
             document.getElementById('vistaVisorPDF').classList.add('d-none');
+            document.getElementById('vistaValidacionCertificado').classList.add('d-none');
+            document.getElementById('vistaResultadoConsultaPublica').classList.add('d-none');
             document.getElementById('vistaListaCapacitaciones').classList.remove('d-none');
+        }
+
+        function regresarDesdeValidacion() {
+            document.getElementById('vistaValidacionCertificado').classList.add('d-none');
+            document.getElementById('cardPanelUsuario').classList.add('d-none');
+            document.getElementById('cardBienvenidaQR').classList.remove('d-none');
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         function generarPDFCertificado(idCapacitacion) {
@@ -1323,23 +1810,116 @@
                     document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
                     document.getElementById('certIdentificacion').textContent = d.identificacion;
                     document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
-                    document.getElementById('certCalificacion').textContent = d.calificacion;
                     document.getElementById('certFechaExpedicion').textContent = d.fecha;
+                    document.getElementById('certNumeroUnico').textContent = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
 
-                    const elementoPDF = document.getElementById('certificadoPDF');
-                    const opciones = {
-                        margin: 10,
-                        filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                    };
+                    setTimeout(() => {
+                        const elementoPDF = document.getElementById('certificadoPDF');
+                        const opciones = {
+                            margin: 0,
+                            filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2, useCORS: true },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                        };
 
-                    html2pdf().set(opciones).from(elementoPDF).save().then(() => {
-                        alert('¡El certificado ha sido descargado exitosamente!');
-                    });
+                        html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+                            alert('¡El certificado ha sido descargado exitosamente!');
+                        });
+                    }, 500);
                 } else {
                     alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
+                }
+            })
+            .catch(err => alert('Error de red al generar PDF: ' + err));
+        }
+
+        function ejecutarValidacionPublicaCertificado(numeroCertificado) {
+            const contenedor = document.getElementById('contenidoResultadoValidacion');
+            contenedor.innerHTML = `<div class="text-center py-3"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Verificando autenticidad del certificado en el sistema...</p></div>`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'validarCertificadoPublico',
+                    numeroCertificado: numeroCertificado
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.valido) {
+                    const d = res.data;
+                    contenedor.innerHTML = `
+                        <div class="alert alert-success text-center mb-3 py-3 fw-bold fs-5">
+                            <i class="fas fa-check-circle me-2"></i> Certificado Auténtico
+                        </div>
+                        <ul class="list-unstyled mb-4" style="font-size: 14px; line-height: 1.8;">
+                            <li><i class="fas fa-building text-primary me-2"></i> <b>Nombre de la empresa:</b> Global Life Ambulancias SAS</li>
+                            <li><i class="fas fa-user text-primary me-2"></i> <b>Nombre completo del participante:</b> ${d.nombreUsuario}</li>
+                            <li><i class="fas fa-id-card text-primary me-2"></i> <b>Documento de identidad:</b> ${d.identificacion}</li>
+                            <li><i class="fas fa-book text-primary me-2"></i> <b>Curso realizado:</b> ${d.capacitacion}</li>
+                            <li><i class="fas fa-calendar-alt text-primary me-2"></i> <b>Fecha de expedición:</b> ${d.fecha}</li>
+                            <li><i class="fas fa-certificate text-primary me-2"></i> <b>Número del certificado:</b> ${d.numeroCertificado}</li>
+                            <li><i class="fas fa-shield-alt text-success me-2"></i> <b>Estado:</b> <span class="fw-bold text-success">VÁLIDO</span></li>
+                        </ul>
+                        <div class="d-grid">
+                            <button class="btn btn-success py-3 rounded-pill fw-bold shadow-sm" onclick="descargarCertificadoPublicoDesdeValidacion('${d.identificacion}', '${d.idCapacitacion || ''}')">
+                                <i class="fas fa-file-pdf me-2"></i> Descargar Certificado
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    contenedor.innerHTML = `
+                        <div class="alert alert-danger text-center mb-3 py-3 fw-bold fs-5">
+                            <i class="fas fa-times-circle me-2"></i> Certificado No Encontrado
+                        </div>
+                        <p class="text-muted text-center small mb-0">Este certificado no es válido o el código consultado no se encuentra registrado en el sistema.</p>
+                    `;
+                }
+            })
+            .catch(err => {
+                contenedor.innerHTML = `
+                    <div class="alert alert-danger text-center">Error de conexión al verificar el certificado.</div>
+                `;
+            });
+        }
+
+        function descargarCertificadoPublicoDesdeValidacion(identificacion, idCapacitacion) {
+            alert('Generando Certificado PDF...');
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'obtenerDatosCertificadoPorNumero',
+                    numeroCertificado: new URLSearchParams(window.location.search).get('validar_certificado')
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    const d = res.data;
+                    document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
+                    document.getElementById('certIdentificacion').textContent = d.identificacion;
+                    document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
+                    document.getElementById('certFechaExpedicion').textContent = d.fecha;
+                    document.getElementById('certNumeroUnico').textContent = d.numeroCertificado;
+
+                    setTimeout(() => {
+                        const elementoPDF = document.getElementById('certificadoPDF');
+                        const opciones = {
+                            margin: 0,
+                            filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2, useCORS: true },
+                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                        };
+
+                        html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+                            alert('¡El certificado ha sido descargado exitosamente!');
+                        });
+                    }, 500);
+                } else {
+                    alert('Error: No se pudo descargar el certificado.');
                 }
             })
             .catch(err => alert('Error de red al generar PDF: ' + err));
@@ -1415,7 +1995,7 @@
                 document.getElementById('generaCertificado').value = "SI";
                 document.getElementById('cantPregExamen').value = "10";
                 document.getElementById('valorPorcentual').value = "10.00% por cada acierto";
-                precargarAreasUnicas([]);
+                precargarJerarquiaAreaCargos([]);
                 return;
             }
 
@@ -1446,8 +2026,8 @@
                 })
                 .then(res => res.json())
                 .then(res => {
-                    let areasAsig = res.success ? res.areasAsignadas : [];
-                    precargarAreasUnicas(areasAsig);
+                    let asignacionesAsig = res.success ? res.asignacionesAsignadas : [];
+                    precargarJerarquiaAreaCargos(asignacionesAsig);
                 });
             }
         }
@@ -1456,9 +2036,19 @@
             e.preventDefault();
             const idEdicion = document.getElementById('editCapId').value;
             
-            let checkboxesAreas = document.querySelectorAll('.check-area-cap:checked');
-            let areasSeleccionadas = [];
-            checkboxesAreas.forEach(cb => areasSeleccionadas.push(cb.value));
+            let asignacionesSeleccionadas = [];
+            // Recoger áreas enteras marcadas
+            let checkboxesAreas = document.querySelectorAll('.check-area-parent:checked');
+            checkboxesAreas.forEach(cb => {
+                // Si el área está marcada completa, la guardamos
+                asignacionesSeleccionadas.push(cb.value);
+            });
+
+            // Recoger cargos marcados específicamente que no estén cubiertos o se guarden individualmente
+            let checkboxesCargos = document.querySelectorAll('.check-cargo-item:checked');
+            checkboxesCargos.forEach(cb => {
+                asignacionesSeleccionadas.push(cb.value); // Formato "AREA:CARGO"
+            });
 
             const data = {
                 id: idEdicion,
@@ -1474,7 +2064,7 @@
                 cantidadPreguntasExamen: document.getElementById('cantPregExamen').value,
                 youtubeUrl: document.getElementById('ytUrl') ? document.getElementById('ytUrl').value : '',
                 pdfUrl: document.getElementById('pdfUrl') ? document.getElementById('pdfUrl').value : '',
-                areas: areasSeleccionadas,
+                asignaciones: asignacionesSeleccionadas, // Enviamos tanto áreas como cargos específicos
                 estado: 'Activa'
             };
 
@@ -1498,7 +2088,7 @@
                         alert('¡Capacitación creada exitosamente con ID: ' + res.id + '!');
                         document.getElementById('formCapacitacion').reset();
                         document.getElementById('catCap').value = "Capacitación";
-                        precargarAreasUnicas([]);
+                        precargarJerarquiaAreaCargos([]);
                     }
                     if (usuarioPuedeModificar) cargarListaCapacitacionesParaModificar();
                 } else {
@@ -1558,7 +2148,7 @@
                         let cleanRow = {};
                         Object.keys(row).forEach(key => {
                             let cleanKey = key.replace(/[\u00A0\s]+/g, '').toLowerCase();
-                            cleanRow[cleanKey] = row[key];
+                            cleanKey[cleanKey] = row[key];
                         });
 
                         let pregTexto = cleanRow['pregunta'] || '';
