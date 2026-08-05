@@ -253,9 +253,9 @@
                             <i class="fas fa-tasks me-2"></i> Gestión de Capacitaciones
                         </button>
                     </li>
-                    <li class="nav-item d-none" role="presentation" id="liTabUsuarios">
-                        <button class="nav-link rounded-3 fw-bold px-4 py-2.5" id="pills-usuarios-tab" data-bs-toggle="pill" data-bs-target="#pills-usuarios" type="button" role="tab" onclick="cargarTablaUsuarios()">
-                            <i class="fas fa-users-cog me-2"></i> Gestión de Usuarios
+                    <li class="nav-item d-none" role="presentation" id="liTabRegistrarUsuario">
+                        <button class="nav-link rounded-3 fw-bold px-4 py-2.5" id="pills-registrar-usuario-tab" data-bs-toggle="pill" data-bs-target="#pills-registrar-usuario" type="button" role="tab">
+                            <i class="fas fa-user-plus me-2"></i> Registrar / Gestionar Usuario
                         </button>
                     </li>
                     <li class="nav-item d-none" role="presentation" id="liTabReportes">
@@ -477,18 +477,23 @@
                         </div>
                     </div>
 
-                    <!-- PESTAÑA 2: GESTIÓN DE USUARIOS -->
-                    <div class="tab-pane fade" id="pills-usuarios" role="tabpanel">
+                    <!-- MÓDULO 2: REGISTRAR / GESTIONAR USUARIO -->
+                    <div class="tab-pane fade" id="pills-registrar-usuario" role="tabpanel">
                         <div class="card shadow border-0 rounded-4 p-4 p-md-5 mb-4 bg-white">
-                            <h5 class="fw-bold mb-4" style="color: var(--gl-blue-primary); font-size: 16px;">
-                                <i class="fas fa-user-plus me-2"></i> Registrar Nuevo Usuario / Funcionario
+                            <h5 class="fw-bold mb-3" style="color: var(--gl-blue-primary); font-size: 16px;">
+                                <i class="fas fa-user-plus me-2"></i> Registrar o Actualizar Usuario / Funcionario
                             </h5>
+                            <p class="text-muted small mb-4">Ingrese primero el número de identificación. Si el funcionario ya está registrado, sus datos se cargarán automáticamente.</p>
 
                             <form id="formCrearUsuario">
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <label class="form-label small fw-semibold text-secondary">Identificación (Cédula)</label>
-                                        <input type="text" class="form-control" id="uIdentificacion" required placeholder="Ej: 80092734">
+                                        <label class="form-label small fw-semibold text-secondary">Identificación (Cédula) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="uIdentificacion" required placeholder="Ej: 80092734" onblur="verificarUsuarioExiste()">
+                                            <button class="btn btn-outline-primary" type="button" onclick="verificarUsuarioExiste()" title="Buscar usuario"><i class="fas fa-search"></i></button>
+                                        </div>
+                                        <div id="mensajeEstadoUsuario" class="form-text text-primary fw-semibold" style="font-size: 11px;"></div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-semibold text-secondary">Fecha de Expedición (Contraseña)</label>
@@ -533,48 +538,10 @@
 
                                 <div class="d-grid gap-2 mt-4">
                                     <button type="submit" id="btnGuardarUsuario" class="btn btn-primary py-3 rounded-3 fw-bold shadow-sm">
-                                        <i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario
+                                        <i class="fas fa-user-check me-2"></i> Guardar / Actualizar Usuario
                                     </button>
                                 </div>
                             </form>
-
-                            <hr class="my-5">
-
-                            <!-- TABLA DE USUARIOS REGISTRADOS -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="fw-bold m-0" style="color: var(--gl-blue-primary); font-size: 16px;">
-                                    <i class="fas fa-users me-2"></i> Usuarios Registrados en el Sistema
-                                </h5>
-                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill fw-bold" onclick="cargarTablaUsuarios()">
-                                    <i class="fas fa-sync-alt me-1"></i> Actualizar
-                                </button>
-                            </div>
-
-                            <div class="mb-3">
-                                <input type="text" class="form-control form-control-sm" id="inputBuscarUsuario" placeholder="Buscar por cédula, nombre, cargo o área..." onkeyup="filtrarTablaUsuarios()">
-                            </div>
-
-                            <div class="table-responsive rounded-3 border bg-white" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-hover align-middle mb-0 text-center">
-                                    <thead class="table-light sticky-top" style="font-size: 13px;">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Identificación</th>
-                                            <th>Nombre</th>
-                                            <th>Cargo / Área</th>
-                                            <th>Fecha Exp.</th>
-                                            <th>Estado</th>
-                                            <th>Admin</th>
-                                            <th>Modif.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbodyUsuarios" style="font-size: 13px;">
-                                        <tr>
-                                            <td colspan="8" class="text-muted py-4">Haz clic en <b>Actualizar</b> para cargar el listado.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
 
@@ -893,7 +860,7 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwt9ZisaIGSE2_saTMD4Hkkg2p1VhduIXAVglFqg1E7dtfLkGczGdjUo49PaZ8LqMrf/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbx2vABRphFXB3hDnf3Y4WyXBFuMXquZMGjmAGznDevwJkeNsI0ijZZNo9nfhYvEYu-L/exec";
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
@@ -905,7 +872,6 @@
         let tiempoRestante = 60;
         let cacheCapacitacionesUsuario = null;
         let datosReporteGlobal = [];
-        let datosUsuariosGlobal = [];
         let areasUnicasGlobal = [];
         let cargosUnicosGlobal = [];
 
@@ -1140,11 +1106,11 @@
                         
                         const seccionSelector = document.getElementById('seccionSelectorModificacion');
                         const liGestion = document.getElementById('liTabGestion');
-                        const liUsuarios = document.getElementById('liTabUsuarios');
+                        const liRegistrar = document.getElementById('liTabRegistrarUsuario');
                         const liReportes = document.getElementById('liTabReportes');
 
                         if (liGestion) liGestion.classList.remove('d-none');
-                        if (liUsuarios) liUsuarios.classList.remove('d-none');
+                        if (liRegistrar) liRegistrar.classList.remove('d-none');
 
                         if (usuarioPuedeModificar) {
                             if (seccionSelector) seccionSelector.classList.remove('d-none');
@@ -1185,6 +1151,7 @@
 
         function precargarAreasUnicas(areasSeleccionadas = []) {
             const contenedor = document.getElementById('contenedorCheckboxesAreas');
+            if(!contenedor) return;
             contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando áreas...</span>`;
 
             fetch(API_URL, {
@@ -1207,6 +1174,7 @@
 
         function precargarCargosUnicos(cargosSeleccionados = []) {
             const contenedor = document.getElementById('contenedorCheckboxesCargos');
+            if(!contenedor) return;
             contenedor.innerHTML = `<span class="text-muted small"><i class="fas fa-spinner fa-spin me-1"></i> Cargando cargos...</span>`;
 
             fetch(API_URL, {
@@ -1229,6 +1197,7 @@
 
         function renderizarCheckboxesAreas(seleccionadas = []) {
             const contenedor = document.getElementById('contenedorCheckboxesAreas');
+            if(!contenedor) return;
             contenedor.innerHTML = "";
 
             if (!areasUnicasGlobal || areasUnicasGlobal.length === 0) {
@@ -1254,6 +1223,7 @@
 
         function renderizarCheckboxesCargos(seleccionados = []) {
             const contenedor = document.getElementById('contenedorCheckboxesCargos');
+            if(!contenedor) return;
             contenedor.innerHTML = "";
 
             if (!cargosUnicosGlobal || cargosUnicosGlobal.length === 0) {
@@ -1277,6 +1247,44 @@
             });
         }
 
+        // VALIDACIÓN AUTOMÁTICA AL DIGITAR CÉDULA DE USUARIO
+        function verificarUsuarioExiste() {
+            const ident = document.getElementById('uIdentificacion').value.trim();
+            const lblEstado = document.getElementById('mensajeEstadoUsuario');
+            if (!ident) {
+                lblEstado.textContent = "";
+                return;
+            }
+
+            lblEstado.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Verificando...`;
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'buscarUsuarioPorIdentificacion', identificacion: ident })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success && res.encontrado) {
+                    const u = res.usuario;
+                    lblEstado.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> Usuario existente. Datos cargados para actualizar.</span>`;
+                    
+                    // Rellenar formulario automáticamente con los datos encontrados
+                    document.getElementById('uFechaExpedicion').value = u.fechaExpedicionInput || "";
+                    document.getElementById('uNombre').value = u.nombre || "";
+                    document.getElementById('uCargo').value = u.cargo || "";
+                    document.getElementById('uArea').value = u.area || "";
+                    document.getElementById('uEstado').value = u.estado || "ACTIVO";
+                    document.getElementById('uAdmin').value = u.admin || "";
+                    document.getElementById('uModificacion').value = u.modificacion || "";
+                } else {
+                    lblEstado.innerHTML = `<span class="text-primary"><i class="fas fa-plus-circle"></i> Cédula nueva. Ingrese los datos para registrar.</span>`;
+                }
+            })
+            .catch(err => {
+                lblEstado.textContent = "";
+            });
+        }
+
         document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -1293,92 +1301,32 @@
 
             const btn = document.getElementById('btnGuardarUsuario');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Registrando usuario...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando cambios...';
 
             fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'crearUsuario', data: dataUsuario })
+                body: JSON.stringify({ action: 'crearOActualizarUsuario', data: dataUsuario })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.success) {
-                    alert('¡Usuario registrado exitosamente en la plataforma!');
+                    alert('¡Usuario guardado o actualizado exitosamente en la plataforma!');
                     document.getElementById('formCrearUsuario').reset();
-                    cargarTablaUsuarios();
+                    document.getElementById('mensajeEstadoUsuario').textContent = "";
                     precargarAreasUnicas();
                     precargarCargosUnicos();
                 } else {
                     alert('Error: ' + res.error);
                 }
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario';
+                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar / Actualizar Usuario';
             })
             .catch(err => {
                 alert('Error de red: ' + err);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar Nuevo Usuario';
+                btn.innerHTML = '<i class="fas fa-user-check me-2"></i> Guardar / Actualizar Usuario';
             });
         });
-
-        function cargarTablaUsuarios() {
-            const tbody = document.getElementById('tbodyUsuarios');
-            tbody.innerHTML = `<tr><td colspan="8" class="py-4"><i class="fas fa-spinner fa-spin me-2 text-primary"></i> Cargando usuarios...</td></tr>`;
-
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'obtenerUsuarios' })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if(res.success) {
-                    datosUsuariosGlobal = res.usuarios;
-                    renderizarTablaUsuarios(datosUsuariosGlobal);
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-danger py-4">Error: ${res.error}</td></tr>`;
-                }
-            })
-            .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-danger py-4">Error de red: ${err}</td></tr>`;
-            });
-        }
-
-        function renderizarTablaUsuarios(lista) {
-            const tbody = document.getElementById('tbodyUsuarios');
-            tbody.innerHTML = "";
-
-            if (!lista || lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-muted py-4">No hay usuarios registrados.</td></tr>`;
-                return;
-            }
-
-            lista.forEach(u => {
-                let badgeEstado = u.estado === 'ACTIVO' ? '<span class="badge bg-success">ACTIVO</span>' : '<span class="badge bg-secondary">INACTIVO</span>';
-                let tr = `
-                    <tr>
-                        <td>${u.idUsuario}</td>
-                        <td class="fw-bold">${u.identificacion}</td>
-                        <td class="text-start">${u.nombre}</td>
-                        <td class="text-start text-muted" style="font-size: 11px;">${u.cargo} / ${u.area}</td>
-                        <td>${u.fechaExpedicion}</td>
-                        <td>${badgeEstado}</td>
-                        <td class="fw-bold text-primary">${u.admin || 'NO'}</td>
-                        <td class="fw-bold text-primary">${u.modificacion || 'NO'}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += tr;
-            });
-        }
-
-        function filtrarTablaUsuarios() {
-            let busqueda = document.getElementById('inputBuscarUsuario').value.toLowerCase();
-            let filtrados = datosUsuariosGlobal.filter(u => {
-                return u.nombre.toLowerCase().includes(busqueda) || 
-                       u.identificacion.toLowerCase().includes(busqueda) || 
-                       u.cargo.toLowerCase().includes(busqueda) ||
-                       u.area.toLowerCase().includes(busqueda);
-            });
-            renderizarTablaUsuarios(filtrados);
-        }
 
         function cambiarVistaUsuario() {
             document.getElementById('cardPanelAdmin').classList.add('d-none');
@@ -1395,7 +1343,6 @@
             cacheCapacitacionesUsuario = null;
             listaCapacitacionesGlobal = [];
             datosReporteGlobal = [];
-            datosUsuariosGlobal = [];
             document.getElementById('formLogin').reset();
             document.getElementById('resultadoLogin').innerHTML = "";
             document.getElementById('cardLogin').classList.remove('d-none');
@@ -1407,11 +1354,14 @@
             const contenedorPendientes = document.getElementById('contenedorCapacitacionesPendientes');
             const contenedorCulminadas = document.getElementById('contenedorCapacitacionesCulminadas');
             
+            if(!contenedorPendientes || !contenedorCulminadas) return;
+
             contenedorPendientes.innerHTML = "";
             contenedorCulminadas.innerHTML = "";
 
             if(!capacitaciones || capacitaciones.length === 0) {
                 contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-warning text-center">No hay capacitaciones asignadas y disponibles para tu área y cargo en este momento.</div></div>`;
+                contenedorCulminadas.innerHTML = `<div class="col-12"><div class="alert alert-light border text-center text-muted py-3 small">Aún no tienes capacitaciones culminadas o aprobadas.</div></div>`;
                 return;
             }
 
@@ -1428,7 +1378,6 @@
                 if (cap.yaAprobo) {
                     contadorCulminadas++;
                     
-                    // Asegurar que si la nota viene como decimal (ej. 0.8), se muestre como 80
                     let notaMostrar = cap.ultimaNota || '100%';
                     let numNota = parseFloat(notaMostrar);
                     if (!isNaN(numNota) && numNota <= 1) {
@@ -1567,7 +1516,9 @@
             }
 
             const contenedorPendientes = document.getElementById('contenedorCapacitacionesPendientes');
-            contenedorPendientes.innerHTML = `<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Cargando capacitaciones...</p></div>`;
+            if(contenedorPendientes) {
+                contenedorPendientes.innerHTML = `<div class="col-12 text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2 text-muted">Cargando capacitaciones...</p></div>`;
+            }
 
             fetch(API_URL, {
                 method: 'POST',
@@ -1579,11 +1530,11 @@
                     cacheCapacitacionesUsuario = res.capacitaciones;
                     renderizarCapacitacionesUsuario(cacheCapacitacionesUsuario);
                 } else {
-                    contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">No se pudieron obtener las capacitaciones.</div></div>`;
+                    if(contenedorPendientes) contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">No se pudieron obtener las capacitaciones.</div></div>`;
                 }
             })
             .catch(err => {
-                contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">Error de conexión: ${err}</div></div>`;
+                if(contenedorPendientes) contenedorPendientes.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center p-4">Error de conexión: ${err}</div></div>`;
             });
         }
 
@@ -1785,7 +1736,6 @@
                 if(res.success) {
                     cacheCapacitacionesUsuario = null;
                     
-                    // Ajuste para asegurar que la calificación se muestre correctamente multiplicada por 100 si viene como decimal
                     let califVal = parseFloat(res.calificacion);
                     if (!isNaN(califVal) && califVal <= 1) {
                         califVal = Math.round(califVal * 100);
@@ -2308,7 +2258,6 @@
                 let esAprobado = String(r.estado).toLowerCase().includes('aprobado');
                 let badge = esAprobado ? '<span class="badge bg-success">Aprobado</span>' : '<span class="badge bg-danger">Reprobado</span>';
 
-                // Asegurar conversión de decimal a entero si viene como 0.8
                 let califTexto = r.calificacion;
                 let numCalif = parseFloat(califTexto);
                 if (!isNaN(numCalif) && numCalif <= 1) {
@@ -2334,10 +2283,10 @@
             let estadoFiltro = document.getElementById('selectFiltroEstado').value.toLowerCase();
 
             let filtrados = datosReporteGlobal.filter(r => {
-                let coincideTexto = r.nombreUsuario.toLowerCase().includes(busqueda) || 
-                                     r.identificacion.toLowerCase().includes(busqueda) || 
-                                     r.capacitacion.toLowerCase().includes(busqueda);
-                let coincideEstado = estadoFiltro === "" || r.estado.toLowerCase().includes(estadoFiltro);
+                let coincideTexto = (r.nombreUsuario || '').toLowerCase().includes(busqueda) || 
+                                     (r.identificacion || '').toLowerCase().includes(busqueda) || 
+                                     (r.capacitacion || '').toLowerCase().includes(busqueda);
+                let coincideEstado = estadoFiltro === "" || (r.estado || '').toLowerCase().includes(estadoFiltro);
                 return coincideTexto && coincideEstado;
             });
 
