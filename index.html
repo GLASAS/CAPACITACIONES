@@ -227,10 +227,9 @@
                         <img src="https://lh3.googleusercontent.com/d/1rnmsTu_RtIMcsrLbYoTlCsLHc_1XOuca" alt="Microsoft Edge" class="browser-icon" title="Microsoft Edge">
                     </div>
 
-                      <div style="font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px; margin-top: 32px;">
-                       Version V3
-                    
-                  </div>
+                    <div style="font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px; margin-top: 32px;">
+                        Version V3
+                    </div>
                 </div>
             </form>
         </div>
@@ -409,6 +408,13 @@
                                         <h6 class="text-success fw-bold mb-3"><i class="fas fa-cloud-upload-alt me-2"></i> Subir Plantilla de Cuestionario</h6>
                                         <p class="text-muted small">Selecciona tu archivo <code>.xlsx</code> con las preguntas. El sistema anidará las preguntas a la capacitación seleccionada abajo.</p>
                                         
+                                        <!-- BOTÓN PARA DESCARGAR LA PLANTILLA DE PREGUNTAS -->
+                                        <div class="mb-4">
+                                            <a href="https://docs.google.com/uc?export=download&id=1fmhmiDfErXWvrV27qcajxbnzZJijyQ0y" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-2 shadow-sm" target="_blank">
+                                                <i class="fas fa-download me-2"></i> Descargar Plantilla de Preguntas (.xlsx)
+                                            </a>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-primary"><i class="fas fa-link me-1"></i> Anidar a Capacitación:</label>
                                             <select class="form-select form-select-sm" id="excelCapAnidada" required>
@@ -772,10 +778,7 @@
 
     </div>
 
-
-
-
-<!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
+    <!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
     <div style="display: none;">
       <div id="certificadoPDF" style="width: 1123px; height: 794px; padding: 35px 55px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 8px solid #1e3a8a; overflow: hidden;">
         
@@ -869,10 +872,6 @@
 
       </div>
     </div>
-
-
-
-
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -1285,7 +1284,6 @@
                     const u = res.usuario;
                     lblEstado.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> Usuario existente. Datos cargados para actualizar.</span>`;
                     
-                    // Rellenar formulario automáticamente con los datos encontrados
                     document.getElementById('uFechaExpedicion').value = u.fechaExpedicionInput || "";
                     document.getElementById('uNombre').value = u.nombre || "";
                     document.getElementById('uCargo').value = u.cargo || "";
