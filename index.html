@@ -228,7 +228,7 @@
                     </div>
 
                       <div style="font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.5px; margin-top: 32px;">
-                       Version V1
+                       Version V3
                     
                   </div>
                 </div>
@@ -409,6 +409,13 @@
                                         <h6 class="text-success fw-bold mb-3"><i class="fas fa-cloud-upload-alt me-2"></i> Subir Plantilla de Cuestionario</h6>
                                         <p class="text-muted small">Selecciona tu archivo <code>.xlsx</code> con las preguntas. El sistema anidará las preguntas a la capacitación seleccionada abajo.</p>
                                         
+                                        <!-- BOTÓN PARA DESCARGAR LA PLANTILLA DE PREGUNTAS -->
+                                        <div class="mb-4">
+                                            <a href="https://docs.google.com/uc?export=download&id=1fmhmiDfErXWvrV27qcajxbnzZJijyQ0y" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3 py-2 shadow-sm" target="_blank">
+                                                <i class="fas fa-download me-2"></i> Descargar Plantilla de Preguntas (.xlsx)
+                                            </a>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label class="form-label small fw-bold text-primary"><i class="fas fa-link me-1"></i> Anidar a Capacitación:</label>
                                             <select class="form-select form-select-sm" id="excelCapAnidada" required>
@@ -772,7 +779,10 @@
 
     </div>
 
-    <!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
+
+
+
+<!-- PLANTILLA OCULTA DE CERTIFICADO PARA EXPEDICIÓN DE PDF -->
     <div style="display: none;">
       <div id="certificadoPDF" style="width: 1123px; height: 794px; padding: 35px 55px; background: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border: 8px solid #1e3a8a; overflow: hidden;">
         
@@ -820,14 +830,14 @@
             <h3 id="certNombreCapacitacion" style="font-size: 22px; color: #1e3a8a; margin: 0; font-weight: bold;">[NOMBRE DE LA CAPACITACIÓN]</h3>
           </div>
 
-          <!-- Información de Expedición -->
+          <!-- Información de Realización (Formato MM-AAAA) -->
           <div style="font-size: 13px; color: #334155; line-height: 1.5;">
             CERTIFICADO No. <strong id="certNumeroUnico" style="color: #0f172a; font-size: 14px;">[NUMERO]</strong><br>
-            Fecha de expedición: <strong id="certFechaExpedicion" style="color: #0f172a; font-size: 14px;">[FECHA]</strong>
+            Fecha de realización: <strong id="certFechaExpedicion" style="color: #0f172a; font-size: 14px;">[FECHA]</strong>
           </div>
         </div>
 
-        <!-- Bloque Inferior con Firma y el Código QR exacto de tu enlace actualizado -->
+        <!-- Bloque Inferior con Firma, Código QR y Nota -->
         <div style="display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; padding: 0 20px; margin-top: 4px;">
           
           <!-- Nota aclaratoria -->
@@ -835,22 +845,22 @@
             <p style="font-size: 10px; color: #64748b; margin: 0; line-height: 1.4;">Escanee el código QR para verificar la autenticidad de este documento en el portal corporativo oficial de Global Life Ambulancias SAS.</p>
           </div>
 
-          <!-- IMAGEN DE QR CORREGIDA CON EL ENLACE DIRECTO DE GOOGLE DRIVE DE TU IMAGEN -->
+          <!-- Código QR de Validación -->
           <div style="text-align: center; width: 22%; display: flex; flex-direction: column; align-items: center;">
             <div style="position: relative; padding: 4px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; display: inline-block; width: 84px; height: 84px; box-sizing: border-box;">
               <img src="https://lh3.googleusercontent.com/d/1rQwY8VD-q686oCfkxy1vUzOOhgXLzmZQ=s220" style="width: 100%; height: 100%; object-fit: contain;" alt="Código QR Fijo">
             </div>
-            <span style="font-size: 9px; color: #64748b; margin-top: 4px; font-weight: bold;">Código de Validación QR</span>
+            <span style="font-size: 9px; color: #64748b; margin-top: 4px; font-weight: bold;">Validación</span>
           </div>
 
-          <!-- Firma del Líder de Talento Humano con la imagen integrada -->
+          <!-- Firma del Líder de Talento Humano COLOCADA DETRÁS DEL TEXTO (z-index menor) -->
           <div style="text-align: center; width: 30%; position: relative;">
-            <!-- Imagen de la firma posicionada exactamente sobre la línea de firma -->
-            <div style="position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 1;">
-              <img src="https://lh3.googleusercontent.com/d/1mOirYD1unmQYnrLYweeI7TQM9iDEHKvk" style="width: 180px; height: auto; object-fit: contain; mix-blend-mode: multiply;" alt="Firma Talento Humano">
+            <!-- Imagen de la firma con z-index: 1 para que quede ubicada por debajo del texto y la línea -->
+            <div style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 190px; pointer-events: none; z-index: 1;">
+              <img src="https://lh3.googleusercontent.com/d/1mOirYD1unmQYnrLYweeI7TQM9iDEHKvk" style="width: 100%; height: auto; object-fit: contain;" alt="Firma Líder Talento Humano">
             </div>
-            <!-- Línea y Texto de la firma -->
-            <div style="border-bottom: 1.5px solid #475569; margin-bottom: 4px; height: 35px; position: relative; z-index: 2;"></div>
+            <!-- Línea divisoria y textos con z-index: 2 para que queden flotando al frente -->
+            <div style="border-bottom: 1.5px solid #475569; margin-bottom: 4px; height: 42px; position: relative; z-index: 2;"></div>
             <p style="font-size: 12px; font-weight: bold; margin: 0; color: #0f172a; position: relative; z-index: 2;">Líder de Talento Humano</p>
             <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0; position: relative; z-index: 2;">Global Life Ambulancias SAS</p>
           </div>
@@ -867,10 +877,14 @@
       </div>
     </div>
 
+
+
+
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbx2vABRphFXB3hDnf3Y4WyXBFuMXquZMGjmAGznDevwJkeNsI0ijZZNo9nfhYvEYu-L/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzt3fQPlGQbAitN55kSShur-wWKam_Sx6uc3hngg4pEVhrULzWHu7Fgh1woyXTRZn6N/exec";
 
         let listaCapacitacionesGlobal = [];
         let usuarioPuedeModificar = false;
