@@ -12,25 +12,47 @@ function generarPDFCertificado(idCapacitacion) {
     .then(res => {
         if (res.success) {
             const d = res.data;
+            const numeroCert = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
+
             document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
             document.getElementById('certIdentificacion').textContent = d.identificacion;
             document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
             document.getElementById('certFechaExpedicion').textContent = d.fecha;
-            document.getElementById('certNumeroUnico').textContent = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
+            document.getElementById('certNumeroUnico').textContent = numeroCert;
+
+            const urlValidacionQR = `${window.location.origin}${window.location.pathname}?validar_certificado=${encodeURIComponent(numeroCert)}`;
+            const qrContainer = document.getElementById('certQrCanvas');
+
+            if (qrContainer && typeof QRCode !== 'undefined') {
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: urlValidacionQR,
+                    width: 80,
+                    height: 80,
+                    colorDark: '#0f172a',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
 
             setTimeout(() => {
                 const elementoPDF = document.getElementById('certificadoPDF');
                 const opciones = {
                     margin: 0,
-                    filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                    filename: `Certificado_${String(d.capacitacion).replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                    jsPDF: { unit: 'pt', format: 'letter', orientation: 'landscape' },
+                    pagebreak: { mode: ['avoid-all'] }
                 };
-                html2pdf().set(opciones).from(elementoPDF).save().then(() => {
+                html2pdf().set(opciones).from(elementoPDF).toPdf().get('pdf').then((pdf) => {
+                    while (pdf.internal.getNumberOfPages() > 1) {
+                        pdf.deletePage(pdf.internal.getNumberOfPages());
+                    }
+                    pdf.save(opciones.filename);
                     alert('¡Certificado descargado exitosamente!');
                 });
-            }, 500);
+            }, 600);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
