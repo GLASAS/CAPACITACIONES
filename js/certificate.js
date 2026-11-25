@@ -20,63 +20,17 @@ function generarPDFCertificado(idCapacitacion) {
 
             setTimeout(() => {
                 const elementoPDF = document.getElementById('certificadoPDF');
-
-                // Crear un contenedor temporal visible de 1056x816 px (Carta horizontal) para que html2canvas lo pinte sin quedar en blanco
-                const wrapper = document.createElement('div');
-                wrapper.style.position = 'fixed';
-                wrapper.style.top = '0';
-                wrapper.style.left = '0';
-                wrapper.style.width = '1056px';
-                wrapper.style.height = '816px';
-                wrapper.style.background = '#ffffff';
-                wrapper.style.zIndex = '99999';
-                wrapper.style.overflow = 'hidden';
-
-                const clon = elementoPDF.cloneNode(true);
-                clon.style.display = 'flex';
-                clon.style.flexDirection = 'column';
-                clon.style.justifyContent = 'space-between';
-                clon.style.width = '1056px';
-                clon.style.height = '816px';
-                clon.style.minWidth = '1056px';
-                clon.style.maxWidth = '1056px';
-                clon.style.minHeight = '816px';
-                clon.style.maxHeight = '816px';
-                clon.style.margin = '0';
-                clon.style.boxSizing = 'border-box';
-                clon.style.transform = 'none';
-                clon.style.overflow = 'hidden';
-
-                wrapper.appendChild(clon);
-                document.body.appendChild(wrapper);
-
                 const opciones = {
                     margin: 0,
                     filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        scrollX: 0,
-                        scrollY: 0,
-                        width: 1056,
-                        height: 816,
-                        windowWidth: 1056,
-                        windowHeight: 816
-                    },
-                    jsPDF: { unit: 'mm', format: 'letter', orientation: 'landscape' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
                 };
-
-                html2pdf().set(opciones).from(clon).save().then(() => {
-                    if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+                html2pdf().set(opciones).from(elementoPDF).save().then(() => {
                     alert('¡Certificado descargado exitosamente!');
-                }).catch((err) => {
-                    if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
-                    alert('Error al generar el PDF: ' + err);
                 });
-            }, 600);
+            }, 500);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
