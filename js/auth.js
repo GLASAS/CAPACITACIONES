@@ -135,3 +135,5 @@ document.getElementById('formLogin').addEventListener('submit', function(e) {
         }
     });
 });
+
+¿Te envío `js/config.js` en el siguiente mensaje?
