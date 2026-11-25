@@ -528,3 +528,4 @@ function regresarDesdeValidacion() {
     document.getElementById('cardBienvenidaQR').classList.remove('d-none');
     window.history.replaceState({}, document.title, window.location.pathname);
 }
+ 
