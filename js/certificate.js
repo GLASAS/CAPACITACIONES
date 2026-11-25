@@ -20,17 +20,100 @@ function generarPDFCertificado(idCapacitacion) {
 
             setTimeout(() => {
                 const elementoPDF = document.getElementById('certificadoPDF');
-                const opciones = {
-                    margin: 0,
-                    filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                };
-                html2pdf().set(opciones).from(elementoPDF).save().then(() => {
-                    alert('¡Certificado descargado exitosamente!');
+
+                // Contenedor invisible (sin tapar la pantalla ni causar destellos raros)
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'fixed';
+                wrapper.style.top = '0';
+                wrapper.style.left = '0';
+                wrapper.style.width = '1056px';
+                wrapper.style.height = '816px';
+                wrapper.style.background = '#ffffff';
+                wrapper.style.opacity = '0';
+                wrapper.style.pointerEvents = 'none';
+                wrapper.style.zIndex = '-1';
+                wrapper.style.overflow = 'hidden';
+
+                const clon = elementoPDF.cloneNode(true);
+                clon.style.display = 'flex';
+                clon.style.flexDirection = 'column';
+                clon.style.justifyContent = 'space-between';
+                clon.style.width = '1056px';
+                clon.style.height = '816px';
+                clon.style.minWidth = '1056px';
+                clon.style.maxWidth = '1056px';
+                clon.style.minHeight = '816px';
+                clon.style.maxHeight = '816px';
+                clon.style.margin = '0';
+                clon.style.boxSizing = 'border-box';
+                clon.style.transform = 'none';
+                clon.style.overflow = 'hidden';
+
+                // Forzar carga limpia de imágenes en el clon
+                const imgs = clon.querySelectorAll('img');
+                imgs.forEach(img => {
+                    img.setAttribute('crossOrigin', 'anonymous');
                 });
-            }, 500);
+
+                wrapper.appendChild(clon);
+                document.body.appendChild(wrapper);
+
+                const esperarImagenes = Promise.all(
+                    Array.from(imgs).map(img => {
+                        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+                        return new Promise(resolve => {
+                            img.addEventListener('load', resolve, { once: true });
+                            img.addEventListener('error', resolve, { once: true });
+                            setTimeout(resolve, 1500);
+                        });
+                    })
+                );
+
+                esperarImagenes.then(() => {
+                    // Hacer visible solo para la captura de html2canvas con opacity 0
+                    wrapper.style.opacity = '0.01';
+
+                    const opciones = {
+                        margin: 0,
+                        filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            logging: false,
+                            scrollX: 0,
+                            scrollY: 0,
+                            width: 1056,
+                            height: 816,
+                            windowWidth: 1056,
+                            windowHeight: 816
+                        },
+                        jsPDF: { unit: 'mm', format: 'letter', orientation: 'landscape' },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    };
+
+                    html2pdf()
+                        .set(opciones)
+                        .from(clon)
+                        .toPdf()
+                        .get('pdf')
+                        .then((pdf) => {
+                            while (pdf.internal.getNumberOfPages() > 1) {
+                                pdf.deletePage(pdf.internal.getNumberOfPages());
+                            }
+                        })
+                        .save()
+                        .then(() => {
+                            if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+                            alert('¡Certificado descargado exitosamente!');
+                        })
+                        .catch((err) => {
+                            if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+                            alert('Error al generar el PDF: ' + err);
+                        });
+                });
+            }, 400);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
