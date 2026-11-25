@@ -20,12 +20,23 @@ function generarPDFCertificado(idCapacitacion) {
 
             setTimeout(() => {
                 const elementoPDF = document.getElementById('certificadoPDF');
+                elementoPDF.style.boxSizing = 'border-box';
+                elementoPDF.style.pageBreakInside = 'avoid';
+                elementoPDF.style.breakInside = 'avoid';
+
                 const opciones = {
                     margin: 0,
                     filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: elementoPDF.scrollWidth || 1122
+                    },
+                    jsPDF: { unit: 'mm', format: 'letter', orientation: 'landscape' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 };
                 html2pdf().set(opciones).from(elementoPDF).save().then(() => {
                     alert('¡Certificado descargado exitosamente!');
