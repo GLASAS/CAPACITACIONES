@@ -1,36 +1,3 @@
-function esperarImagenesCertificado(contenedor) {
-    if (!contenedor) return Promise.resolve();
-    const imgs = Array.from(contenedor.querySelectorAll('img'));
-    if (imgs.length === 0) return Promise.resolve();
-
-    return Promise.all(imgs.map(img => {
-        return new Promise(resolve => {
-            if (img.complete && img.naturalWidth > 0) {
-                resolve();
-                return;
-            }
-            const limpiar = () => {
-                img.removeEventListener('load', onLoad);
-                img.removeEventListener('error', onError);
-            };
-            const onLoad = () => {
-                limpiar();
-                resolve();
-            };
-            const onError = () => {
-                limpiar();
-                resolve();
-            };
-            img.addEventListener('load', onLoad);
-            img.addEventListener('error', onError);
-            setTimeout(() => {
-                limpiar();
-                resolve();
-            }, 2500);
-        });
-    }));
-}
-
 function generarPDFCertificado(idCapacitacion) {
     alert('Generando Certificado PDF...');
     fetch(API_URL, {
@@ -42,61 +9,28 @@ function generarPDFCertificado(idCapacitacion) {
         })
     })
     .then(res => res.json())
-    .then(async res => {
+    .then(res => {
         if (res.success) {
             const d = res.data;
-            const numeroCert = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
-
             document.getElementById('certNombreUsuario').textContent = d.nombreUsuario;
             document.getElementById('certIdentificacion').textContent = d.identificacion;
             document.getElementById('certNombreCapacitacion').textContent = d.capacitacion;
             document.getElementById('certFechaExpedicion').textContent = d.fecha;
-            document.getElementById('certNumeroUnico').textContent = numeroCert;
-
-            const urlValidacionQR = `${window.location.origin}${window.location.pathname}?validar_certificado=${encodeURIComponent(numeroCert)}`;
-            const qrContainer = document.getElementById('certQrCanvas');
-
-            if (qrContainer && typeof QRCode !== 'undefined') {
-                qrContainer.innerHTML = '';
-                new QRCode(qrContainer, {
-                    text: urlValidacionQR,
-                    width: 80,
-                    height: 80,
-                    colorDark: '#0f172a',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
-                });
-            }
-
-            const elementoPDF = document.getElementById('certificadoPDF');
-            await esperarImagenesCertificado(elementoPDF);
+            document.getElementById('certNumeroUnico').textContent = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
 
             setTimeout(() => {
+                const elementoPDF = document.getElementById('certificadoPDF');
                 const opciones = {
                     margin: 0,
-                    filename: `Certificado_${String(d.capacitacion).replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
+                    filename: `Certificado_${d.capacitacion.replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: '#ffffff',
-                        scrollX: 0,
-                        scrollY: 0,
-                        windowWidth: 1056,
-                        windowHeight: 816
-                    },
-                    jsPDF: { unit: 'pt', format: 'letter', orientation: 'landscape' },
-                    pagebreak: { mode: ['avoid-all'] }
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
                 };
-                html2pdf().set(opciones).from(elementoPDF).toPdf().get('pdf').then((pdf) => {
-                    while (pdf.internal.getNumberOfPages() > 1) {
-                        pdf.deletePage(pdf.internal.getNumberOfPages());
-                    }
-                    pdf.save(opciones.filename);
+                html2pdf().set(opciones).from(elementoPDF).save().then(() => {
                     alert('¡Certificado descargado exitosamente!');
                 });
-            }, 400);
+            }, 500);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
