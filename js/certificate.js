@@ -20,53 +20,43 @@ function generarPDFCertificado(idCapacitacion) {
 
             setTimeout(() => {
                 const elementoPDF = document.getElementById('certificadoPDF');
-                const estiloOriginal = {
-                    width: elementoPDF.style.width,
-                    maxWidth: elementoPDF.style.maxWidth,
-                    margin: elementoPDF.style.margin,
-                    transform: elementoPDF.style.transform,
-                    transformOrigin: elementoPDF.style.transformOrigin,
-                    boxSizing: elementoPDF.style.boxSizing,
-                    overflow: elementoPDF.style.overflow,
-                    position: elementoPDF.style.position,
-                    left: elementoPDF.style.left,
-                    top: elementoPDF.style.top
-                };
+                const padre = elementoPDF.parentElement;
 
-                const anchoCartaPx = 1056;
-                const altoCartaPx = 816;
+                const padreOriginal = padre ? padre.getAttribute('style') || '' : '';
+                const elemOriginal = elementoPDF.getAttribute('style') || '';
 
-                elementoPDF.style.boxSizing = 'border-box';
+                // Posicionar en el origen visible (0,0) para que html2canvas no capture lienzo en blanco
+                if (padre) {
+                    padre.style.display = 'block';
+                    padre.style.position = 'fixed';
+                    padre.style.left = '0';
+                    padre.style.top = '0';
+                    padre.style.width = '1056px';
+                    padre.style.height = '816px';
+                    padre.style.zIndex = '-9999';
+                    padre.style.opacity = '1';
+                    padre.style.visibility = 'visible';
+                    padre.style.overflow = 'hidden';
+                }
+
+                elementoPDF.style.display = 'flex';
                 elementoPDF.style.position = 'relative';
                 elementoPDF.style.left = '0';
                 elementoPDF.style.top = '0';
                 elementoPDF.style.margin = '0';
-                elementoPDF.style.transformOrigin = 'top left';
+                elementoPDF.style.width = '1056px';
+                elementoPDF.style.minWidth = '1056px';
+                elementoPDF.style.maxWidth = '1056px';
+                elementoPDF.style.height = '816px';
+                elementoPDF.style.minHeight = '816px';
+                elementoPDF.style.maxHeight = '816px';
+                elementoPDF.style.boxSizing = 'border-box';
+                elementoPDF.style.transform = 'none';
                 elementoPDF.style.overflow = 'hidden';
-                elementoPDF.style.pageBreakInside = 'avoid';
-                elementoPDF.style.breakInside = 'avoid';
 
-                const rect = elementoPDF.getBoundingClientRect();
-                const anchoActual = rect.width || elementoPDF.scrollWidth || anchoCartaPx;
-                const altoActual = rect.height || elementoPDF.scrollHeight || altoCartaPx;
-
-                elementoPDF.style.width = anchoCartaPx + 'px';
-                elementoPDF.style.maxWidth = anchoCartaPx + 'px';
-
-                const escalaFinal = Math.min(1, anchoCartaPx / anchoActual, altoCartaPx / altoActual);
-                elementoPDF.style.transform = escalaFinal < 1 ? `scale(${escalaFinal})` : 'none';
-
-                const restaurarEstilos = () => {
-                    elementoPDF.style.width = estiloOriginal.width;
-                    elementoPDF.style.maxWidth = estiloOriginal.maxWidth;
-                    elementoPDF.style.margin = estiloOriginal.margin;
-                    elementoPDF.style.transform = estiloOriginal.transform;
-                    elementoPDF.style.transformOrigin = estiloOriginal.transformOrigin;
-                    elementoPDF.style.boxSizing = estiloOriginal.boxSizing;
-                    elementoPDF.style.overflow = estiloOriginal.overflow;
-                    elementoPDF.style.position = estiloOriginal.position;
-                    elementoPDF.style.left = estiloOriginal.left;
-                    elementoPDF.style.top = estiloOriginal.top;
+                const restaurar = () => {
+                    if (padre) padre.setAttribute('style', padreOriginal);
+                    elementoPDF.setAttribute('style', elemOriginal);
                 };
 
                 const opciones = {
@@ -78,8 +68,12 @@ function generarPDFCertificado(idCapacitacion) {
                         useCORS: true,
                         scrollX: 0,
                         scrollY: 0,
-                        windowWidth: anchoCartaPx,
-                        windowHeight: altoCartaPx
+                        x: 0,
+                        y: 0,
+                        width: 1056,
+                        height: 816,
+                        windowWidth: 1056,
+                        windowHeight: 816
                     },
                     jsPDF: { unit: 'mm', format: 'letter', orientation: 'landscape' },
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
@@ -97,14 +91,14 @@ function generarPDFCertificado(idCapacitacion) {
                     })
                     .save()
                     .then(() => {
-                        restaurarEstilos();
+                        restaurar();
                         alert('¡Certificado descargado exitosamente!');
                     })
                     .catch((err) => {
-                        restaurarEstilos();
+                        restaurar();
                         alert('Error al generar el PDF: ' + err);
                     });
-            }, 500);
+            }, 600);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
