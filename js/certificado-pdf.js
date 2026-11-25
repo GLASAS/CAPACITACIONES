@@ -3,6 +3,15 @@
     const generarPDFCertificadoOriginal = window.generarPDFCertificado;
 
     function ajustarCertificadoParaCartaHorizontal(elemento) {
+        const padre = elemento.parentElement;
+        const padreSnapshot = padre ? {
+            display: padre.style.display,
+            position: padre.style.position,
+            left: padre.style.left,
+            top: padre.style.top,
+            visibility: padre.style.visibility
+        } : null;
+
         const snapshot = {
             width: elemento.style.width,
             minWidth: elemento.style.minWidth,
@@ -26,6 +35,14 @@
         const anchoCartaPx = 1056;
         const altoCartaPx = 816;
 
+        if (padre) {
+            padre.style.display = 'block';
+            padre.style.position = 'fixed';
+            padre.style.left = '-9999px';
+            padre.style.top = '0';
+            padre.style.visibility = 'visible';
+        }
+
         elemento.style.boxSizing = 'border-box';
         elemento.style.position = 'relative';
         elemento.style.left = '0';
@@ -35,23 +52,14 @@
         elemento.style.transformOrigin = 'top left';
         elemento.style.overflow = 'hidden';
 
-        // Si el certificado tiene ancho distinto, lo ajustamos y escalamos proporcionalmente para que quepa en 1 hoja
-        const rect = elemento.getBoundingClientRect();
-        const anchoActual = rect.width || elemento.scrollWidth || anchoCartaPx;
-        const altoActual = rect.height || elemento.scrollHeight || altoCartaPx;
-
+        // Ajuste directo al tamaño de Carta horizontal sin transform: scale para evitar recortes en html2canvas
         elemento.style.width = anchoCartaPx + 'px';
+        elemento.style.minWidth = anchoCartaPx + 'px';
         elemento.style.maxWidth = anchoCartaPx + 'px';
-
-        const escalaAncho = anchoCartaPx / anchoActual;
-        const escalaAlto = altoCartaPx / altoActual;
-        const escalaFinal = Math.min(1, escalaAncho, escalaAlto);
-
-        if (escalaFinal < 1) {
-            elemento.style.transform = `scale(${escalaFinal})`;
-        } else {
-            elemento.style.transform = 'none';
-        }
+        elemento.style.height = altoCartaPx + 'px';
+        elemento.style.minHeight = altoCartaPx + 'px';
+        elemento.style.maxHeight = altoCartaPx + 'px';
+        elemento.style.transform = 'none';
 
         return function restaurar() {
             elemento.style.width = snapshot.width;
@@ -70,6 +78,14 @@
             elemento.style.left = snapshot.left;
             elemento.style.top = snapshot.top;
             elemento.style.zoom = snapshot.zoom;
+
+            if (padre && padreSnapshot) {
+                padre.style.display = padreSnapshot.display;
+                padre.style.position = padreSnapshot.position;
+                padre.style.left = padreSnapshot.left;
+                padre.style.top = padreSnapshot.top;
+                padre.style.visibility = padreSnapshot.visibility;
+            }
         };
     }
 
