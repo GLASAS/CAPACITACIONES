@@ -1,3 +1,36 @@
+function esperarImagenesCertificado(contenedor) {
+    if (!contenedor) return Promise.resolve();
+    const imgs = Array.from(contenedor.querySelectorAll('img'));
+    if (imgs.length === 0) return Promise.resolve();
+
+    return Promise.all(imgs.map(img => {
+        return new Promise(resolve => {
+            if (img.complete && img.naturalWidth > 0) {
+                resolve();
+                return;
+            }
+            const limpiar = () => {
+                img.removeEventListener('load', onLoad);
+                img.removeEventListener('error', onError);
+            };
+            const onLoad = () => {
+                limpiar();
+                resolve();
+            };
+            const onError = () => {
+                limpiar();
+                resolve();
+            };
+            img.addEventListener('load', onLoad);
+            img.addEventListener('error', onError);
+            setTimeout(() => {
+                limpiar();
+                resolve();
+            }, 2500);
+        });
+    }));
+}
+
 function generarPDFCertificado(idCapacitacion) {
     alert('Generando Certificado PDF...');
     fetch(API_URL, {
@@ -9,7 +42,7 @@ function generarPDFCertificado(idCapacitacion) {
         })
     })
     .then(res => res.json())
-    .then(res => {
+    .then(async res => {
         if (res.success) {
             const d = res.data;
             const numeroCert = d.numeroCertificado || `GL-${d.identificacion}-${idCapacitacion}`;
@@ -35,13 +68,24 @@ function generarPDFCertificado(idCapacitacion) {
                 });
             }
 
+            const elementoPDF = document.getElementById('certificadoPDF');
+            await esperarImagenesCertificado(elementoPDF);
+
             setTimeout(() => {
-                const elementoPDF = document.getElementById('certificadoPDF');
                 const opciones = {
                     margin: 0,
                     filename: `Certificado_${String(d.capacitacion).replace(/\s+/g, '_')}_${d.identificacion}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth: 1056,
+                        windowHeight: 816
+                    },
                     jsPDF: { unit: 'pt', format: 'letter', orientation: 'landscape' },
                     pagebreak: { mode: ['avoid-all'] }
                 };
@@ -52,7 +96,7 @@ function generarPDFCertificado(idCapacitacion) {
                     pdf.save(opciones.filename);
                     alert('¡Certificado descargado exitosamente!');
                 });
-            }, 600);
+            }, 400);
         } else {
             alert('Error: ' + (res.error || 'No se pudieron obtener los datos.'));
         }
